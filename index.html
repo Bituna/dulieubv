@@ -219,7 +219,18 @@ button,input,select{font-family:inherit;}
       <div class="tbadge" id="pbadge">—</div>
     </div>
     <div class="tright">
-      <span style="font-size:11px;color:var(--sub);">Kỳ:</span>
+      <span style="font-size:11px;color:var(--sub);">Năm:</span>
+      <input id="sel-year" list="year-list-top" value="2025"
+        onchange="setYear(this.value)"
+        onblur="addYearToList(this.value)"
+        style="padding:4px 8px;border-radius:5px;font-size:11px;border:1px solid var(--border);background:var(--card);cursor:text;font-family:inherit;width:72px;text-align:center;">
+      <datalist id="year-list-top">
+        <option value="2020"><option value="2021"><option value="2022">
+        <option value="2023"><option value="2024"><option value="2025">
+        <option value="2026"><option value="2027"><option value="2028">
+        <option value="2029"><option value="2030">
+      </datalist>
+      <span style="font-size:11px;color:var(--sub);margin-left:4px;">Kỳ:</span>
       <button class="pb active" onclick="setPT('thang',this)">Tháng</button>
       <button class="pb" onclick="setPT('quy',this)">Quý</button>
       <button class="pb" onclick="setPT('gd',this)">Giai đoạn</button>
@@ -344,14 +355,28 @@ button,input,select{font-family:inherit;}
       <div class="cb">
         <div class="form-row">
           <div class="form-group">
+            <div class="form-label">Năm</div>
+            <input class="form-select" id="inp-year" list="year-list-form"
+              value="2025"
+              onchange="syncYearFromForm(this.value)"
+              onblur="addYearToList(this.value)"
+              style="min-width:90px;text-align:center;">
+            <datalist id="year-list-form">
+              <option value="2020"><option value="2021"><option value="2022">
+              <option value="2023"><option value="2024"><option value="2025">
+              <option value="2026"><option value="2027"><option value="2028">
+              <option value="2029"><option value="2030">
+            </datalist>
+          </div>
+          <div class="form-group">
             <div class="form-label">Tháng báo cáo</div>
             <select class="form-select" id="inp-month">
-              <option value="1">Tháng 1 / 2025</option><option value="2">Tháng 2 / 2025</option>
-              <option value="3">Tháng 3 / 2025</option><option value="4">Tháng 4 / 2025</option>
-              <option value="5" selected>Tháng 5 / 2025</option><option value="6">Tháng 6 / 2025</option>
-              <option value="7">Tháng 7 / 2025</option><option value="8">Tháng 8 / 2025</option>
-              <option value="9">Tháng 9 / 2025</option><option value="10">Tháng 10 / 2025</option>
-              <option value="11">Tháng 11 / 2025</option><option value="12">Tháng 12 / 2025</option>
+              <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
+              <option value="3">Tháng 3</option><option value="4">Tháng 4</option>
+              <option value="5" selected>Tháng 5</option><option value="6">Tháng 6</option>
+              <option value="7">Tháng 7</option><option value="8">Tháng 8</option>
+              <option value="9">Tháng 9</option><option value="10">Tháng 10</option>
+              <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
             </select>
           </div>
           <div class="form-group">
@@ -426,7 +451,7 @@ const NHOM = {'Giường kế hoạch':'Công suất','Công suất sử dụng 
 
 /* ══ STATE ══ */
 let DB={},MA=[],DA=[],IA=[];
-let selM=new Date().getMonth()+1,pt='thang',l2m='k',selD='',selI='',l3v='kh',xI='',xD='';
+let selM=new Date().getMonth()+1,selYear=new Date().getFullYear(),pt='thang',l2m='k',selD='',selI='',l3v='kh',xI='',xD='';
 let cD=null,cT=null,cKHY=null,cP=null;
 let inputTab='thuc',inputVals={};
 
@@ -498,14 +523,79 @@ function pc2(p){return p>=100?'pg':p>=70?'py':'pr';}
 function ckc(p){return p>=0?'pg':'pr';}
 function expV(m){return Math.round(m/12*1000)/10;}
 function p2p(p){return Math.min(p,130)/130*100;}
-function gd(d,i){return DB[selM]?.[d]?.[i]||{t:0,kn:0,kt:0,ck:0,pkn:0,pck:0,nh:''};}
+function getMonthsForPeriod(){
+  // Trả về mảng tháng cần tổng hợp theo pt + selM
+  if(pt==='thang') return [selM]; // 1 tháng
+  if(pt==='quy'){
+    // Q1=T1-3, Q2=T4-6, Q3=T7-9, Q4=T10-12
+    var map={3:[1,2,3],6:[4,5,6],9:[7,8,9],12:[10,11,12]};
+    return map[selM]||[selM];
+  }
+  if(pt==='gd'){
+    // 3T=T1-3, 6T=T1-6, 9T=T1-9, 12T=T1-12
+    var months=[];
+    for(var i=1;i<=selM;i++) months.push(i);
+    return months;
+  }
+  return [selM];
+}
+
+function gd(d,i){
+  // Tổng hợp dữ liệu theo kỳ đang chọn
+  var months=getMonthsForPeriod();
+  if(months.length===1) return DB[months[0]]?.[d]?.[i]||{t:0,kn:0,kt:0,ck:0,pkn:0,pck:0,nh:''};
+  
+  // Tổng hợp nhiều tháng
+  var result={t:0,kn:0,kt:0,ck:0,pkn:0,pck:0,nh:''};
+  var cntT=0, cntCK=0;
+  months.forEach(function(m){
+    var row=DB[m]?.[d]?.[i];
+    if(!row) return;
+    result.t   += row.t   ||0;
+    result.kn   = row.kn  ||0; // KH năm không cộng dồn
+    result.kt   = row.kt  ||0; // KH tháng TB không cộng dồn
+    result.ck  += row.ck  ||0;
+    result.nh   = row.nh  ||result.nh;
+    if(row.t  >0) cntT++;
+    if(row.ck >0) cntCK++;
+  });
+  // Tính % theo tổng
+  var nMonths=months.length;
+  result.kn_period=result.kn; // KH cả kỳ = KH/12 * số tháng
+  if(result.kn>0){
+    result.pkn=result.t/(result.kn/12*nMonths);
+    result.pck=result.ck>0?(result.t/result.ck-1):0;
+  }
+  return result;
+}
 
 /* ══ PERIOD ══ */
-const PTC={thang:{f:()=>MA.map(m=>'T'+m),v:()=>MA,d:()=>MA.length-1},quy:{f:()=>['Q1','Q2','Q3','Q4'],v:()=>[3,6,9,12],d:()=>0},gd:{f:()=>['3T','6T','9T','12T'],v:()=>[3,6,9,12],d:()=>0}};
+const PTC={
+  thang:{
+    f:function(){return MA.map(function(m){return 'T'+m;});},
+    v:function(){return MA;},
+    d:function(){return MA.length-1;},
+    label:function(selM){return 'Thang '+selM+' / '+selYear;}
+  },
+  quy:{
+    f:function(){return ['Quy 1','Quy 2','Quy 3','Quy 4'];},
+    v:function(){return [3,6,9,12];},
+    d:function(){return 0;},
+    label:function(selM){var q={3:'Quy 1',6:'Quy 2',9:'Quy 3',12:'Quy 4'};return (q[selM]||'Quy')+' / '+selYear;}
+  },
+  gd:{
+    f:function(){return ['3 thang','6 thang','9 thang','Ca nam'];},
+    v:function(){return [3,6,9,12];},
+    d:function(){return 1;},
+    label:function(selM){var g={3:'3 thang dau',6:'6 thang dau',9:'9 thang dau',12:'Ca nam'};return (g[selM]||'')+' '+selYear;}
+  }
+};
 function buildPUI(){
-  const c=PTC[pt],items=c.f(),vals=c.v(),def=c.d();
+  var c=PTC[pt],items=c.f(),vals=c.v(),def=c.d();
   selM=vals[def];
-  document.getElementById('sp').innerHTML=items.map((l,i)=>'<button class="sb2'+(vals[i]===selM?' active':'')+'" onclick="setSub('+vals[i]+',this)">'+l+'</button>').join('');
+  document.getElementById('sp').innerHTML=items.map(function(l,i){
+    return '<button class="sb2'+(vals[i]===selM?' active':'')+'" onclick="setSub('+vals[i]+',this)">'+l+'</button>';
+  }).join('');
   updateB();
 }
 function setPT(t,btn){pt=t;document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');buildPUI();refresh();}
@@ -518,9 +608,79 @@ function setSub(m,btn){
   if(mSel) mSel.value=String(m);
   updateB();refresh();
 }
+
+function setYear(y){
+  var yr=parseInt(y);
+  if(isNaN(yr)||yr<1900||yr>2100) return;
+  selYear=yr;
+  // Sync cả 2 input
+  var yForm=document.getElementById('inp-year');
+  if(yForm) yForm.value=String(selYear);
+  var yTop=document.getElementById('sel-year');
+  if(yTop) yTop.value=String(selYear);
+  updateB();refresh();
+}
+
+function syncYearFromForm(y){
+  setYear(y);
+}
+
+function addYearToList(y){
+  var yr=parseInt(y);
+  if(isNaN(yr)||yr<1900||yr>2100) return;
+  selYear=yr;
+  // Thêm vào cả 2 datalist nếu chưa có
+  ['year-list-top','year-list-form'].forEach(function(id){
+    var dl=document.getElementById(id);
+    if(!dl) return;
+    var exists=false;
+    var opts=dl.querySelectorAll('option');
+    for(var i=0;i<opts.length;i++){
+      if(parseInt(opts[i].value)===yr){exists=true;break;}
+    }
+    if(!exists){
+      var opt=document.createElement('option');
+      opt.value=String(yr);
+      dl.appendChild(opt);
+    }
+  });
+  // Lưu vào localStorage để nhớ cho lần sau
+  try{
+    var saved=JSON.parse(localStorage.getItem('bv_years')||'[]');
+    if(saved.indexOf(yr)<0){
+      saved.push(yr);
+      saved.sort(function(a,b){return a-b;});
+      localStorage.setItem('bv_years',JSON.stringify(saved));
+    }
+  }catch(e){}
+  updateB();refresh();
+}
+
+function loadSavedYears(){
+  try{
+    var saved=JSON.parse(localStorage.getItem('bv_years')||'[]');
+    saved.forEach(function(yr){
+      ['year-list-top','year-list-form'].forEach(function(id){
+        var dl=document.getElementById(id);
+        if(!dl) return;
+        var exists=false;
+        var opts=dl.querySelectorAll('option');
+        for(var i=0;i<opts.length;i++){
+          if(parseInt(opts[i].value)===yr){exists=true;break;}
+        }
+        if(!exists){
+          var opt=document.createElement('option');
+          opt.value=String(yr);
+          dl.appendChild(opt);
+        }
+      });
+    });
+  }catch(e){}
+}
 function updateB(){
+  var c=PTC[pt];
   var mLabel=selM||new Date().getMonth()+1;
-  var l=pt==='thang'?'Thang '+mLabel+' / 2025':'Den T'+mLabel+' / 2025';
+  var l=c&&c.label?c.label(mLabel):('Thang '+mLabel+' / '+(selYear||2025));
   var pb=document.getElementById('pbadge');
   var l3=document.getElementById('l3per');
   if(pb) pb.textContent=l;
@@ -576,7 +736,12 @@ function refresh(){renderKPI();renderL2();renderL3();}
 
 /* ══ KPI ══ */
 function renderKPI(){
-  const e=expV(selM);document.getElementById('kvsub').textContent='Kỳ vọng T'+selM+': '+e+'%';
+  const e=expV(selM);
+  var months2=getMonthsForPeriod();
+  var lastM=months2[months2.length-1];
+  var eVal=Math.round(lastM/12*1000)/10;
+  var pLabel=PTC[pt]&&PTC[pt].label?PTC[pt].label(selM):('T'+selM);
+  document.getElementById('kvsub').textContent='Ky vong '+pLabel+': '+eVal+'%';
   const tv=DA.find(d=>d.includes('Toàn')||d.includes('Toan'))||DA[0];
   const KD=[{p:'khám',i:'🏥',l:'Lượt khám',u:'lượt',a:'#2563EB'},{p:'nội trú',i:'🛏️',l:'BN nội trú',u:'BN',a:'#0891B2'},{p:'ngoại',i:'👤',l:'BN ngoại trú',u:'BN',a:'#7C3AED'},{p:'huyết',i:'🧪',l:'Huyết học',u:'XN',a:'#059669'},{p:'thuật',i:'⚕️',l:'Thủ thuật',u:'Ca',a:'#D97706'}];
   document.getElementById('kcg').innerHTML=KD.map(k=>{
@@ -603,7 +768,7 @@ function renderKPI(){
 /* ══ L2 ══ */
 function renderL2(){
   if(!document.getElementById('l2f').children.length)buildL2F();
-  const e=expV(selM);document.getElementById('l2ax').innerHTML=[0,50,100,130].map(t=>'<span class="atk" style="left:'+p2p(t)+'%">'+t+'%</span>').join('');
+  var e2=expV(getMonthsForPeriod()[getMonthsForPeriod().length-1]);document.getElementById('l2ax').innerHTML=[0,50,100,130].map(t=>'<span class="atk" style="left:'+p2p(t)+'%">'+t+'%</span>').join('');
   const p50=p2p(50),p100=p2p(100),pe=p2p(e);
   let rows=[];
   if(l2m==='k'){document.getElementById('l2t').textContent='% đạt KH năm — '+selD;document.getElementById('l2sub').textContent='Tất cả chỉ tiêu';rows=IA.map(i=>Object.assign({n:i},gd(selD,i)));}
@@ -689,6 +854,18 @@ function buildInputForm(){
     dSel.addEventListener('change',function(){ buildInputTable(); });
     dSel._listenerAdded=true;
   }
+  var ySel2=document.getElementById('inp-year');
+  if(ySel2 && !ySel2._listenerAdded){
+    ySel2.addEventListener('change',function(){
+      addYearToList(this.value);
+      buildInputTable();
+    });
+    ySel2.addEventListener('blur',function(){
+      addYearToList(this.value);
+      buildInputTable();
+    });
+    ySel2._listenerAdded=true;
+  }
   buildInputTable();
 }
 
@@ -697,7 +874,7 @@ function setInputTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   const month=document.getElementById('inp-month').value;
-  var lblMap={thuc:'Thuc hien T'+month,kh:'KH Nam 2025',ck:'Cung ky T'+month+'/2024'};
+  var lblMap={thuc:'Thuc hien T'+month,kh:'KH Nam '+inpYear,ck:'Cung ky T'+month+'/'+(parseInt(inpYear)-1)};
   var el=document.getElementById('inp-col-lbl');
   if(el) el.textContent=lblMap[tab]||tab;
   buildInputTable();
@@ -707,13 +884,14 @@ function buildInputTable(){
   var month=document.getElementById('inp-month').value||String(new Date().getMonth()+1);
   var dept=document.getElementById('inp-dept').value||'Toan vien';
   // Update header cột theo tab hiện tại
-  var lblMap2={thuc:'Thuc hien T'+month,kh:'KH Nam 2025',ck:'Cung ky T'+month+'/2024'};
+  var lblMap2={thuc:'Thuc hien T'+month,kh:'KH Nam '+inpYear,ck:'Cung ky T'+month+'/'+(parseInt(inpYear)-1)};
   var colLbl=document.getElementById('inp-col-lbl');
   if(colLbl) colLbl.textContent=lblMap2[inputTab]||inputTab;
   var rows='';
   for(var i=0;i<INDICATORS.length;i++){
     var ind=INDICATORS[i];
-    var key=month+'||'+dept+'||'+ind+'||'+inputTab;
+    var inpYear=document.getElementById('inp-year')?document.getElementById('inp-year').value:String(selYear||2025);
+    var key=inpYear+'||'+month+'||'+dept+'||'+ind+'||'+inputTab;
     var val=inputVals[key]||'';
     var bg=i%2===0?'#FAFAFA':'#fff';
     rows+='<tr style="background:'+bg+'">';
@@ -734,7 +912,7 @@ function buildInputTable(){
     inputs[j].addEventListener('focus',function(){this.style.borderColor='#3B82F6';});
     inputs[j].addEventListener('blur',function(){this.style.borderColor='#E2E8F0';});
   }
-  var labels={thuc:'Thuc hien T'+month,kh:'KH Nam 2025',ck:'Cung ky T'+month+'/2024'};
+  var labels={thuc:'Thuc hien T'+month,kh:'KH Nam '+inpYear,ck:'Cung ky T'+month+'/'+(parseInt(inpYear)-1)};
   document.getElementById('inp-col-lbl').textContent=labels[inputTab]||inputTab;
 }
 
@@ -747,6 +925,7 @@ document.getElementById('apps-script-code').textContent=
 
 /* ══ AUTO CONNECT ══ */
 window.addEventListener('load',()=>{
+  loadSavedYears();
   const csv=localStorage.getItem(SK_CSV);
   if(csv){document.getElementById('csv-url').value=csv;const w=localStorage.getItem(SK_WRITE);if(w)document.getElementById('write-url').value=w;loadData(csv);}
 });
