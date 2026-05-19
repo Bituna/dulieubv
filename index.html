@@ -732,8 +732,10 @@ function showPage(id,el){
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   el.classList.add('active');
-  document.getElementById('pgtitle').textContent=PTITLES[id];
-  if(id==='xh')renderXH();if(id==='fin')renderFin();
+  document.getElementById('pgtitle').textContent=PTITLES[id]||id;
+  if(id==='xh') renderXH();
+  if(id==='fin') renderFin();
+  if(id==='input') { setTimeout(function(){ buildInputForm(); buildInputTable2(); }, 50); }
 }
 function refresh(){renderKPI();renderL2();renderL3();}
 
@@ -871,6 +873,7 @@ function setInputTab(tab,btn){
 }
 
 function buildInputTable2(){
+  try {
   var dept=document.getElementById('inp-dept')?document.getElementById('inp-dept').value:'Toan vien';
   var inpYear=document.getElementById('inp-year')?document.getElementById('inp-year').value:'2025';
 
@@ -948,8 +951,8 @@ function buildInputTable2(){
       });
     })(inputs[j]);
   }
+  } catch(err) { console.error("buildInputTable2 error:", err); }
 }
-
 // Xóa buildInputTable cũ (không dùng nữa)
 function buildInputTable(){ buildInputTable2(); }
 
