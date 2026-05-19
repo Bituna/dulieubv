@@ -768,8 +768,8 @@ function renderKPI(){
 function renderL2(){
   if(!document.getElementById('l2f').children.length)buildL2F();
   var eL2=expV(getMonthsForPeriod()[getMonthsForPeriod().length-1]);document.getElementById('l2ax').innerHTML=[0,50,100,130].map(t=>'<span class="atk" style="left:'+p2p(t)+'%">'+t+'%</span>').join('');
-  var p50=p2p(50),p100=p2p(100),pe=p2p(eVal);
-  let rows=[];
+  var p50=p2p(50),p100=p2p(100),pe=p2p(eL2);
+  var rows=[];
   if(l2m==='k'){document.getElementById('l2t').textContent='% đạt KH năm — '+selD;document.getElementById('l2sub').textContent='Tất cả chỉ tiêu';rows=IA.map(i=>Object.assign({n:i},gd(selD,i)));}
   else{document.getElementById('l2t').textContent=selI+' — So sánh khoa';document.getElementById('l2sub').textContent='% KH năm';rows=DA.filter(d=>!d.includes('Toàn')&&!d.includes('Toan')).map(d=>Object.assign({n:d},gd(d,selI)));}
   document.getElementById('l2bars').innerHTML=rows.map(r=>{
