@@ -180,18 +180,14 @@ button,input,select{font-family:inherit;}
 <!-- SETUP -->
 <div id="setup">
   <div class="setup-box">
-    <div class="setup-title">🏥 Dashboard Báo cáo Bệnh viện 2025</div>
+    <div class="setup-title">🏥 Dashboard Báo cáo Bệnh viện</div>
     <div class="setup-sub">Nhập 2 đường link Google Sheets để kết nối dữ liệu.<br>Chỉ cần thiết lập 1 lần — trình duyệt tự nhớ.</div>
-
     <label class="setup-label">1. Link CSV (để đọc dashboard):</label>
     <input class="setup-input" id="csv-url" type="text" placeholder="https://docs.google.com/spreadsheets/d/.../pub?...&output=csv">
-
     <label class="setup-label">2. Link Apps Script (để nhập liệu — có thể bỏ trống nếu chỉ xem):</label>
     <input class="setup-input" id="write-url" type="text" placeholder="https://script.google.com/macros/s/.../exec">
-
     <button class="setup-btn" onclick="connect()">🔗 Kết nối và xem Dashboard</button>
     <div id="setup-err"></div>
-
     <div class="setup-hint">
       <strong style="color:rgba(255,255,255,.7)">Lấy link CSV:</strong> Google Sheets → File → Share → Publish to web → sheet LS_DATA_AUTO → CSV → Publish → Copy link<br><br>
       <strong style="color:rgba(255,255,255,.7)">Lấy link Apps Script:</strong> Google Sheets → Extensions → Apps Script → Deploy → Web app → Copy URL
@@ -238,17 +234,13 @@ button,input,select{font-family:inherit;}
     </div>
     <div class="tright">
       <span style="font-size:11px;color:var(--sub);">Năm:</span>
-      <input id="sel-year" list="year-list-top" value="2025"
-        onchange="setYear(this.value)"
-        onblur="addYearToList(this.value)"
-        style="padding:4px 8px;border-radius:5px;font-size:11px;border:1px solid var(--border);background:var(--card);cursor:text;font-family:inherit;width:72px;text-align:center;">
+      <input id="sel-year" list="year-list-top" value="2025" onchange="setYear(this.value)" onblur="addYearToList(this.value)" style="padding:4px 8px;border-radius:5px;font-size:11px;border:1px solid var(--border);background:var(--card);width:72px;text-align:center;font-family:inherit;">
       <datalist id="year-list-top">
-        <option value="2020"><option value="2021"><option value="2022">
-        <option value="2023"><option value="2024"><option value="2025">
-        <option value="2026"><option value="2027"><option value="2028">
-        <option value="2029"><option value="2030">
+        <option value="2020"><option value="2021"><option value="2022"><option value="2023">
+        <option value="2024"><option value="2025"><option value="2026"><option value="2027">
+        <option value="2028"><option value="2029"><option value="2030">
       </datalist>
-      <span style="font-size:11px;color:var(--sub);margin-left:4px;">Kỳ:</span>
+      <span style="font-size:11px;color:var(--sub);">Kỳ:</span>
       <button class="pb active" onclick="setPT('thang',this)">Tháng</button>
       <button class="pb" onclick="setPT('quy',this)">Quý</button>
       <button class="pb" onclick="setPT('gd',this)">Giai đoạn</button>
@@ -257,7 +249,7 @@ button,input,select{font-family:inherit;}
     </div>
   </div>
 
-  <!-- KPI PAGE -->
+  <!-- KPI -->
   <div class="page active" id="page-kpi">
     <div class="kgrid" id="kcg"></div>
     <div class="tcol">
@@ -270,7 +262,10 @@ button,input,select{font-family:inherit;}
             <span><i class="dot" style="background:var(--red)"></i>&lt;70%</span>
           </div>
         </div>
-        <div class="cb"><div class="ax"><div class="asp"></div><div class="atr" id="kax"></div></div><div class="blist" id="kbars"></div></div>
+        <div class="cb">
+          <div class="ax"><div class="asp"></div><div class="atr" id="kax"></div></div>
+          <div class="blist" id="kbars"></div>
+        </div>
       </div>
       <div class="card">
         <div class="ch"><div class="ct" id="dchttl">Thực hiện theo khoa</div></div>
@@ -279,7 +274,7 @@ button,input,select{font-family:inherit;}
     </div>
   </div>
 
-  <!-- TIẾN ĐỘ PAGE -->
+  <!-- TIẾN ĐỘ -->
   <div class="page" id="page-td">
     <div class="fr">
       <span class="fl">Xem theo:</span>
@@ -306,7 +301,7 @@ button,input,select{font-family:inherit;}
     </div>
   </div>
 
-  <!-- BẢNG PAGE -->
+  <!-- BẢNG -->
   <div class="page" id="page-bang">
     <div class="fr">
       <span class="fl">So sánh:</span>
@@ -320,7 +315,7 @@ button,input,select{font-family:inherit;}
     </div>
   </div>
 
-  <!-- XU HƯỚNG PAGE -->
+  <!-- XU HƯỚNG -->
   <div class="page" id="page-xh">
     <div class="fr"><span class="fl">Chỉ tiêu:</span><div id="xiif" style="display:flex;flex-wrap:wrap;gap:4px;"></div></div>
     <div class="fr"><span class="fl">Khoa:</span><div id="xidf" style="display:flex;flex-wrap:wrap;gap:4px;"></div></div>
@@ -329,8 +324,25 @@ button,input,select{font-family:inherit;}
         <div><div class="ct">📉 Xu hướng — <span id="xhttl"></span></div><div class="csub">Lũy kế theo tháng</div></div>
         <div class="lgd">
           <span><i style="display:inline-block;width:16px;height:2.5px;background:#2563EB;border-radius:1px;"></i>Năm nay</span>
-          <
-  <!-- TÀI CHÍNH PAGE -->
+          <span><i style="display:inline-block;width:16px;height:2px;background:var(--purple);border-radius:1px;"></i>KH lũy kế</span>
+          <span><i style="display:inline-block;width:16px;height:2px;background:var(--amber);border-radius:1px;"></i>Cùng kỳ</span>
+        </div>
+      </div>
+      <div class="cb" style="height:265px;position:relative"><canvas id="cT"></canvas></div>
+    </div>
+    <div class="tcol" style="margin-top:12px;">
+      <div class="card">
+        <div class="ch"><div class="ct">% KH năm — từng khoa</div><div class="csub" id="khykv"></div></div>
+        <div class="cb" style="height:195px;position:relative"><canvas id="cKHY"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Tăng trưởng so cùng kỳ</div></div>
+        <div class="cb" id="gcards"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TÀI CHÍNH -->
   <div class="page" id="page-fin">
     <div class="fkg" id="fkg"></div>
     <div class="tcol">
@@ -345,32 +357,28 @@ button,input,select{font-family:inherit;}
     </div>
   </div>
 
-  <!-- NHẬP LIỆU PAGE -->
+  <!-- NHẬP LIỆU -->
   <div class="page" id="page-input">
     <div class="form-note">
-      💡 <strong>Cách nhập:</strong> Chọn khoa → chọn loại dữ liệu → điền số vào ô tương ứng với từng tháng → click <strong>💾 Lưu</strong>.<br>
-      Ô xanh = Thực hiện &nbsp;|&nbsp; Ô xanh lá = KH năm &nbsp;|&nbsp; Ô vàng = Cùng kỳ năm trước
+      💡 <strong>Cách nhập:</strong> Chọn khoa → chọn loại → điền số vào ô tương ứng từng tháng → click <strong>💾 Lưu</strong>.<br>
+      Tab <strong>Thực hiện</strong>: ô xanh &nbsp;|&nbsp; <strong>KH năm</strong>: ô xanh lá &nbsp;|&nbsp; <strong>Cùng kỳ</strong>: ô vàng
     </div>
     <div class="form-card">
       <div class="ch">
         <div class="ct">✏️ Nhập số liệu</div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <div class="form-group" style="flex-direction:row;align-items:center;gap:6px;">
-            <div class="form-label" style="margin:0;">Năm</div>
-            <input id="inp-year" list="year-list-form" value="2025"
-              onchange="syncYearFromForm(this.value)"
-              onblur="addYearToList(this.value)"
-              style="padding:5px 8px;border-radius:6px;font-size:12px;border:1px solid var(--border);width:80px;text-align:center;font-family:inherit;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;">Năm</span>
+            <input id="inp-year" list="year-list-form" value="2025" onchange="syncYearFromForm(this.value)" onblur="addYearToList(this.value)" style="padding:5px 8px;border-radius:6px;font-size:12px;border:1px solid var(--border);width:80px;text-align:center;font-family:inherit;">
             <datalist id="year-list-form">
-              <option value="2020"><option value="2021"><option value="2022">
-              <option value="2023"><option value="2024"><option value="2025">
-              <option value="2026"><option value="2027"><option value="2028">
-              <option value="2029"><option value="2030">
+              <option value="2020"><option value="2021"><option value="2022"><option value="2023">
+              <option value="2024"><option value="2025"><option value="2026"><option value="2027">
+              <option value="2028"><option value="2029"><option value="2030">
             </datalist>
           </div>
-          <div class="form-group" style="flex-direction:row;align-items:center;gap:6px;">
-            <div class="form-label" style="margin:0;">Khoa</div>
-            <select class="form-select" id="inp-dept" style="min-width:140px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;">Khoa</span>
+            <select class="form-select" id="inp-dept" style="min-width:150px;">
               <option value="Toàn viện">Toàn viện</option>
               <option value="Cấp cứu">Cấp cứu</option>
               <option value="Yêu cầu">Yêu cầu</option>
@@ -383,7 +391,7 @@ button,input,select{font-family:inherit;}
               <option value="KB 33 Lê Đại Hành">KB 33 Lê Đại Hành</option>
             </select>
           </div>
-          <div class="tab-row" style="margin:0;gap:4px;">
+          <div style="display:flex;gap:4px;">
             <button class="tab-btn active" onclick="setInputTab('thuc',this)">Thực hiện</button>
             <button class="tab-btn" onclick="setInputTab('kh',this)">KH năm</button>
             <button class="tab-btn" onclick="setInputTab('ck',this)">Cùng kỳ</button>
@@ -400,62 +408,29 @@ button,input,select{font-family:inherit;}
         <div style="display:flex;gap:8px;align-items:center;padding:8px 14px;">
           <button class="save-btn" id="save-btn" onclick="saveData()">💾 Lưu dữ liệu</button>
           <button class="clear-btn" onclick="clearForm()">🗑️ Xóa form</button>
-          <span style="font-size:11px;color:var(--sub);">Dữ liệu giữ trong bộ nhớ — nhớ Lưu trước khi đóng trang!</span>
+          <span style="font-size:11px;color:var(--sub);">Nhớ Lưu trước khi đóng trang!</span>
         </div>
         <div id="save-msg" style="padding:0 14px;"></div>
       </div>
     </div>
   </div>
-option value="Nội 3">Nội 3</option>
-              <option value="Nội 4">Nội 4</option>
-              <option value="Nội 5">Nội 5</option>
-              <option value="KB">KB</option>
-              <option value="KB 33 Lê Đại Hành">KB 33 Lê Đại Hành</option>
-            </select>
-          </div>
-        </div>
-        <div class="tab-row">
-          <button class="tab-btn active" onclick="setInputTab('thuc',this)">Thực hiện</button>
-          <button class="tab-btn" onclick="setInputTab('kh',this)">KH năm</button>
-          <button class="tab-btn" onclick="setInputTab('ck',this)">Cùng kỳ</button>
-        </div>
-        <div style="overflow-x:auto;margin-bottom:14px;">
-          <table class="dtbl" id="inp-tbl">
-            <thead><tr>
-              <th style="width:32px;">#</th>
-              <th style="min-width:220px;">Chỉ tiêu</th>
-              <th style="width:70px;">ĐV</th>
-              <th style="min-width:150px;" id="inp-col-lbl">Thực hiện T5</th>
-            </tr></thead>
-            <tbody id="inp-tbody"></tbody>
-          </table>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <button class="save-btn" id="save-btn" onclick="saveData()">💾 Lưu dữ liệu</button>
-          <button class="clear-btn" onclick="clearForm()">🔄 Xóa form</button>
-        </div>
-        <div id="save-msg"></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- HƯỚNG DẪN PAGE -->
+  <!-- HƯỚNG DẪN -->
   <div class="page" id="page-huongdan">
     <div class="card">
       <div class="ch"><div class="ct">📖 Hướng dẫn cài đặt Google Apps Script</div></div>
       <div class="cb" style="font-size:12px;line-height:1.8;color:#475569;">
-        <p style="margin-bottom:12px;"><strong style="color:#1B2A4A;">Bước 1:</strong> Mở Google Sheets → <strong>Extensions → Apps Script</strong></p>
-        <p style="margin-bottom:8px;"><strong style="color:#1B2A4A;">Bước 2:</strong> Xóa hết code cũ → Paste code sau:</p>
-        <div class="code-box" id="apps-script-code"></div>
-        <p style="margin-top:12px;margin-bottom:8px;"><strong style="color:#1B2A4A;">Bước 3:</strong> Ctrl+S → <strong>Deploy → New deployment → Web app</strong></p>
-        <p style="margin-bottom:8px;">Execute as: <strong>Me</strong> &nbsp;|&nbsp; Who has access: <strong>Anyone</strong> → Deploy → Copy URL</p>
-        <p style="margin-bottom:12px;"><strong style="color:#1B2A4A;">Bước 4:</strong> Click <strong>⚙️ Đổi nguồn</strong> ở sidebar → dán URL Apps Script vào ô thứ 2</p>
+        <p style="margin-bottom:10px;"><strong style="color:#1B2A4A;">Bước 1:</strong> Mở Google Sheets → <strong>Extensions → Apps Script</strong></p>
+        <p style="margin-bottom:8px;"><strong style="color:#1B2A4A;">Bước 2:</strong> Xóa hết code cũ → Paste code từ file AppScript_BenhVien_v2.gs</p>
+        <p style="margin-bottom:8px;"><strong style="color:#1B2A4A;">Bước 3:</strong> Ctrl+S → <strong>Deploy → New deployment → Web app → Execute as: Me → Anyone → Deploy → Copy URL</strong></p>
+        <p style="margin-bottom:12px;"><strong style="color:#1B2A4A;">Bước 4:</strong> Click <strong>⚙️ Đổi nguồn</strong> ở sidebar → dán URL vào ô Apps Script</p>
         <div style="background:#D1FAE5;padding:10px 14px;border-radius:8px;color:#065F46;font-size:12px;">
-          ✅ Sau khi cài xong, tab <strong>✏️ Nhập liệu</strong> sẽ ghi dữ liệu thẳng vào Google Sheets — dashboard tự cập nhật sau 5 phút.
+          ✅ Sau khi cài xong, tab Nhập liệu sẽ ghi thẳng vào Google Sheets.
         </div>
       </div>
     </div>
   </div>
+
 </div>
 
 <script>
@@ -1053,4 +1028,5 @@ window.addEventListener('load',function(){
 });
 </script>
 </body>
+
 </html>
