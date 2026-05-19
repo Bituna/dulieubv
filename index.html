@@ -1020,20 +1020,6 @@ function clearForm(){
   showMsg('Da xoa du lieu cua '+dept+' nam '+inpYear,'ok');
 }
 
-/* ══ NAV ══ */
-var PTITLES={kpi:'KPI Tong quan',td:'Tien do vs KH',bang:'Bang so lieu',xh:'Xu huong',fin:'Tai chinh',input:'Nhap lieu',huongdan:'Huong dan'};
-function showPage(id,el){
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
-  document.getElementById('page-'+id).classList.add('active');
-  el.classList.add('active');
-  document.getElementById('pgtitle').textContent=PTITLES[id]||id;
-  if(id==='xh') renderXH();
-  if(id==='fin') renderFin();
-  if(id==='input') buildInputTable2();
-}
-function refresh(){renderKPI();renderL2();renderL3();}
-
 /* ══ AUTO CONNECT ══ */
 window.addEventListener('load',function(){
   loadSavedYears();
