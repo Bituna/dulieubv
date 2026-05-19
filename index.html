@@ -356,7 +356,18 @@ button,input,select{font-family:inherit;}
           </div>
           <div class="form-group">
             <div class="form-label">Khoa / Phòng</div>
-            <select class="form-select" id="inp-dept"></select>
+            <select class="form-select" id="inp-dept">
+              <option value="Toàn viện">Toàn viện</option>
+              <option value="Cấp cứu">Cấp cứu</option>
+              <option value="Yêu cầu">Yêu cầu</option>
+              <option value="Nội 1">Nội 1</option>
+              <option value="Nội 2">Nội 2</option>
+              <option value="Nội 3">Nội 3</option>
+              <option value="Nội 4">Nội 4</option>
+              <option value="Nội 5">Nội 5</option>
+              <option value="KB">KB</option>
+              <option value="KB 33 Lê Đại Hành">KB 33 Lê Đại Hành</option>
+            </select>
           </div>
         </div>
         <div class="tab-row">
@@ -650,10 +661,11 @@ function renderFin(){
 
 /* ══ INPUT FORM ══ */
 function buildInputForm(){
-  // Populate dept select
-  const sel=document.getElementById('inp-dept');
-  sel.innerHTML=DA.map(d=>'<option value="'+d+'">'+d+'</option>').join('');
-  // Build table rows
+  // Nếu DA đã load từ Sheets thì cập nhật select, không thì giữ nguyên danh sách cố định
+  if(DA && DA.length>0){
+    var sel=document.getElementById('inp-dept');
+    sel.innerHTML=DA.map(function(d){return '<option value="'+d+'">'+d+'</option>';}).join('');
+  }
   buildInputTable();
 }
 
