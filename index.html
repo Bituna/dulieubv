@@ -426,7 +426,7 @@ const NHOM = {'Giường kế hoạch':'Công suất','Công suất sử dụng 
 
 /* ══ STATE ══ */
 let DB={},MA=[],DA=[],IA=[];
-let selM=1,pt='thang',l2m='k',selD='',selI='',l3v='kh',xI='',xD='';
+let selM=new Date().getMonth()+1,pt='thang',l2m='k',selD='',selI='',l3v='kh',xI='',xD='';
 let cD=null,cT=null,cKHY=null,cP=null;
 let inputTab='thuc',inputVals={};
 
@@ -509,11 +509,22 @@ function buildPUI(){
   updateB();
 }
 function setPT(t,btn){pt=t;document.querySelectorAll('.pb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');buildPUI();refresh();}
-function setSub(m,btn){selM=m;document.querySelectorAll('.sb2').forEach(b=>b.classList.remove('active'));btn.classList.add('active');updateB();refresh();}
+function setSub(m,btn){
+  selM=m;
+  document.querySelectorAll('.sb2').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // Sync với form nhập liệu
+  var mSel=document.getElementById('inp-month');
+  if(mSel) mSel.value=String(m);
+  updateB();refresh();
+}
 function updateB(){
-  const l=pt==='thang'?'Tháng '+selM+' / 2025':'Đến T'+selM+' / 2025';
-  document.getElementById('pbadge').textContent=l;
-  document.getElementById('l3per').textContent=l;
+  var mLabel=selM||new Date().getMonth()+1;
+  var l=pt==='thang'?'Thang '+mLabel+' / 2025':'Den T'+mLabel+' / 2025';
+  var pb=document.getElementById('pbadge');
+  var l3=document.getElementById('l3per');
+  if(pb) pb.textContent=l;
+  if(l3) l3.textContent=l;
 }
 
 /* ══ FILTERS ══ */
@@ -661,10 +672,22 @@ function renderFin(){
 
 /* ══ INPUT FORM ══ */
 function buildInputForm(){
-  // Nếu DA đã load từ Sheets thì cập nhật select, không thì giữ nguyên danh sách cố định
+  // Nếu DA đã load từ Sheets thì cập nhật select
   if(DA && DA.length>0){
     var sel=document.getElementById('inp-dept');
-    sel.innerHTML=DA.map(function(d){return '<option value="'+d+'">'+d+'</option>';}).join('');
+    var curDept=sel.value;
+    sel.innerHTML=DA.map(function(d){return '<option value="'+d+'"'+(d===curDept?' selected':'')+'>'+d+'</option>';}).join('');
+  }
+  // Gắn change listener cho month/dept (chỉ gắn 1 lần)
+  var mSel=document.getElementById('inp-month');
+  var dSel=document.getElementById('inp-dept');
+  if(!mSel._listenerAdded){
+    mSel.addEventListener('change',function(){ buildInputTable(); });
+    mSel._listenerAdded=true;
+  }
+  if(!dSel._listenerAdded){
+    dSel.addEventListener('change',function(){ buildInputTable(); });
+    dSel._listenerAdded=true;
   }
   buildInputTable();
 }
@@ -674,14 +697,19 @@ function setInputTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   const month=document.getElementById('inp-month').value;
-  var labels2={thuc:'Thuc hien T'+month,kh:'KH Nam 2025',ck:'Cung ky T'+month+'/2024'};
-  document.getElementById('inp-col-lbl').textContent=labels2[tab]||tab;
+  var lblMap={thuc:'Thuc hien T'+month,kh:'KH Nam 2025',ck:'Cung ky T'+month+'/2024'};
+  var el=document.getElementById('inp-col-lbl');
+  if(el) el.textContent=lblMap[tab]||tab;
   buildInputTable();
 }
 
 function buildInputTable(){
-  var month=document.getElementById('inp-month').value;
-  var dept=document.getElementById('inp-dept').value;
+  var month=document.getElementById('inp-month').value||String(new Date().getMonth()+1);
+  var dept=document.getElementById('inp-dept').value||'Toan vien';
+  // Update header cột theo tab hiện tại
+  var lblMap2={thuc:'Thuc hien T'+month,kh:'KH Nam 2025',ck:'Cung ky T'+month+'/2024'};
+  var colLbl=document.getElementById('inp-col-lbl');
+  if(colLbl) colLbl.textContent=lblMap2[inputTab]||inputTab;
   var rows='';
   for(var i=0;i<INDICATORS.length;i++){
     var ind=INDICATORS[i];
