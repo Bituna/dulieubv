@@ -329,7 +329,23 @@ button,input,select{font-family:inherit;}
         <div><div class="ct">📉 Xu hướng — <span id="xhttl"></span></div><div class="csub">Lũy kế theo tháng</div></div>
         <div class="lgd">
           <span><i style="display:inline-block;width:16px;height:2.5px;background:#2563EB;border-radius:1px;"></i>Năm nay</span>
-          <  <!-- NHẬP LIỆU PAGE -->
+          <
+  <!-- TÀI CHÍNH PAGE -->
+  <div class="page" id="page-fin">
+    <div class="fkg" id="fkg"></div>
+    <div class="tcol">
+      <div class="card">
+        <div class="ch"><div class="ct">💰 Chi tiết (triệu đồng)</div></div>
+        <div class="cb" style="padding:0;overflow-x:auto;"><table class="dtbl" id="ftbl"></table></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">🥧 Cơ cấu doanh thu</div></div>
+        <div class="cb" style="height:295px;position:relative"><canvas id="cP"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NHẬP LIỆU PAGE -->
   <div class="page" id="page-input">
     <div class="form-note">
       💡 <strong>Cách nhập:</strong> Chọn khoa → chọn loại dữ liệu → điền số vào ô tương ứng với từng tháng → click <strong>💾 Lưu</strong>.<br>
@@ -873,6 +889,7 @@ function setInputTab(tab,btn){
 }
 
 function buildInputTable2(){
+  console.log('buildInputTable2 called, INDICATORS:', INDICATORS ? INDICATORS.length : 'undefined');
   try {
   var dept=document.getElementById('inp-dept')?document.getElementById('inp-dept').value:'Toan vien';
   var inpYear=document.getElementById('inp-year')?document.getElementById('inp-year').value:'2025';
