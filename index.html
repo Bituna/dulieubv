@@ -199,25 +199,88 @@ button,input,select{font-family:inherit;}
 </head>
 <body>
 
-<div id="setup">
-  <div class="sbox">
-    <div class="slogo">&#x1F3E5;</div>
-    <div class="stitle">Dashboard Báo cáo Bệnh viện</div>
-    <div class="ssub">Ket noi Supabase de luu du lieu online.<br>Xem cong khai — nhap lieu can mat khau. Chi thiet lap 1 lan.</div>
-    <label class="slbl">Supabase Project URL</label>
-    <input class="sinp" id="sb-url" type="text" placeholder="https://xxxxxxxxxxxx.supabase.co" value="https://qdgdesatsylisfdfamiy.supabase.co">
-    <label class="slbl">Supabase Anon Key (public)</label>
-    <input class="sinp" id="sb-key" type="text" placeholder="eyJhbGciOiJIUzI1NiIs..." value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZ2Rlc2F0c3lsaXNmZGZhbWl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzODUyNzksImV4cCI6MjA5NDk2MTI3OX0.UqA9701cS1VwVKrBUEn4dHDNHC3dgWBAFkGfyhVeUwM">
-    <label class="slbl">Mật khẩu nhập liệu (để trống = ai cũng nhập được)</label>
-    <input class="sinp" id="sb-pass" type="password" placeholder="Ví dụ: BV@2025">
-    <button class="sbtn2" onclick="doConnect()">&#x1F517; Kết nối và bắt đầu</button>
-    <div class="serr" id="serr"></div>
-    <div class="shint">
-      Lấy URL + Key: supabase.com &#x2192; Project &#x2192; Settings &#x2192; API<br>
-      Tạo bảng: SQL Editor &#x2192; chay SQL trong tab Hướng dẫn
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#1B2A4A 0%,#0F172A 60%,#1E3A5F 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div style="width:100%;max-width:420px;">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:48px;margin-bottom:12px;">🏥</div>
+      <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:5px;">Báo cáo Bệnh viện</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.45);">Vui lòng đăng nhập để tiếp tục</div>
+    </div>
+    <div style="background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.13);border-radius:16px;padding:28px 30px;">
+      <div style="margin-bottom:14px;">
+        <label style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px;">Khoa / Phòng</label>
+        <select id="login-dept" style="width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:13px;outline:none;font-family:inherit;">
+          <option value="admin">🔑 Phòng Kế hoạch Tổng hợp (Admin)</option>
+          <option value="TV">Toàn viện</option>
+          <option value="CC">Cấp cứu</option>
+          <option value="YC">Yêu cầu</option>
+          <option value="N1">Nội 1</option>
+          <option value="N2">Nội 2</option>
+          <option value="N3">Nội 3</option>
+          <option value="N4">Nội 4</option>
+          <option value="N5">Nội 5</option>
+          <option value="KB">KB</option>
+          <option value="KB33">KB 33 Lê Đại Hành</option>
+          <option value="XN">Xét nghiệm</option>
+          <option value="CDHA">CĐHA</option>
+        </select>
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px;">Mật khẩu</label>
+        <input id="login-pw" type="password" placeholder="Nhập mật khẩu..." onkeydown="if(event.key==='Enter')doLogin()"
+          style="width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:13px;outline:none;font-family:inherit;">
+      </div>
+      <button onclick="doLogin()" style="width:100%;padding:12px;border-radius:9px;background:#2563EB;color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;">
+        🔐 Đăng nhập
+      </button>
+      <div id="login-err" style="margin-top:10px;padding:8px 12px;background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.35);border-radius:7px;color:#FCA5A5;font-size:12px;display:none;text-align:center;"></div>
+    </div>
+    <div style="text-align:center;margin-top:14px;font-size:10px;color:rgba(255,255,255,.2);">
+      Mật khẩu mặc định: <strong style="color:rgba(255,255,255,.4);">1</strong> &nbsp;|&nbsp; Đổi mật khẩu trong ⚙️ Cài đặt
     </div>
   </div>
 </div>
+
+<!-- SETTINGS MODAL (đổi mật khẩu) -->
+<div id="settings-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:998;display:none;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:28px 30px;max-width:460px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="font-size:15px;font-weight:700;color:#1B2A4A;">⚙️ Cài đặt mật khẩu</div>
+      <button onclick="document.getElementById('settings-modal').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94A3B8;">✕</button>
+    </div>
+    <!-- Tab admin: đổi MK tất cả khoa -->
+    <div id="settings-admin" style="display:none;">
+      <div style="font-size:12px;color:#64748B;margin-bottom:14px;">Đặt lại mật khẩu cho từng khoa. Để trống = giữ nguyên mật khẩu cũ.</div>
+      <div id="settings-dept-list" style="max-height:300px;overflow-y:auto;"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid #E2E8F0;">
+        <div style="font-size:12px;font-weight:600;color:#1B2A4A;margin-bottom:8px;">Mật khẩu Admin</div>
+        <input id="new-admin-pw" type="password" placeholder="Mật khẩu admin mới (để trống = giữ nguyên)" style="width:100%;padding:8px 10px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:12px;outline:none;font-family:inherit;margin-bottom:8px;">
+      </div>
+      <button onclick="saveAllPasswords()" style="width:100%;padding:10px;border-radius:8px;background:#2563EB;color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;margin-top:8px;">💾 Lưu tất cả</button>
+    </div>
+    <!-- Tab khoa: chỉ đổi MK của mình -->
+    <div id="settings-dept" style="display:none;">
+      <div style="font-size:12px;color:#64748B;margin-bottom:14px;" id="settings-dept-name"></div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;font-weight:600;color:#64748B;display:block;margin-bottom:4px;">Mật khẩu hiện tại</label>
+        <input id="cur-pw" type="password" placeholder="Nhập mật khẩu hiện tại" style="width:100%;padding:8px 10px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:12px;outline:none;font-family:inherit;">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;font-weight:600;color:#64748B;display:block;margin-bottom:4px;">Mật khẩu mới</label>
+        <input id="new-pw" type="password" placeholder="Mật khẩu mới" style="width:100%;padding:8px 10px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:12px;outline:none;font-family:inherit;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:11px;font-weight:600;color:#64748B;display:block;margin-bottom:4px;">Xác nhận mật khẩu mới</label>
+        <input id="confirm-pw" type="password" placeholder="Nhập lại mật khẩu mới" style="width:100%;padding:8px 10px;border:1.5px solid #E2E8F0;border-radius:7px;font-size:12px;outline:none;font-family:inherit;">
+      </div>
+      <button onclick="changeDeptPassword()" style="width:100%;padding:10px;border-radius:8px;background:#2563EB;color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;">💾 Đổi mật khẩu</button>
+    </div>
+    <div id="settings-msg" style="margin-top:10px;font-size:12px;display:none;padding:8px 12px;border-radius:7px;text-align:center;"></div>
+  </div>
+</div>
+
+
 
 <div id="loading">
   <div class="spin"></div>
@@ -225,15 +288,6 @@ button,input,select{font-family:inherit;}
   <div style="color:rgba(255,255,255,.3);font-size:11px;margin-top:4px;" id="load-sub"></div>
 </div>
 
-<div id="auth-modal">
-  <div class="abox">
-    <div class="attl">&#x1F510; Xác thực nhập liệu</div>
-    <div class="asub">Nhập mật khẩu để vào trang nhập liệu</div>
-    <input class="ainp" id="auth-pw" type="password" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')doAuth()">
-    <button class="abtn" onclick="doAuth()">Xác nhận</button>
-    <div class="aerr" id="aerr">Mật khẩu không đúng!</div>
-  </div>
-</div>
 
 <div class="sidebar">
   <div class="slo">
@@ -249,14 +303,14 @@ button,input,select{font-family:inherit;}
   <div class="ni" onclick="showPage('xh',this)"><span>&#x1F4C9;</span>Xu hướng</div>
   <div class="ni" onclick="showPage('fin',this)"><span>&#x1F4B0;</span>Tài chính</div>
   <div class="nsec">QUẢN LÝ</div>
-  <div class="ni" onclick="showPage('input',this)"><span>&#x270F;</span>Nhập số liệu</div>
-  <div class="ni" onclick="showPage('kh',this)"><span>&#x1F3AF;</span>Kế hoạch năm</div>
+  <div class="ni" id="nav-input" onclick="showPage('input',this)"><span>&#x270F;</span>Nhập số liệu</div>
+  <div class="ni" id="nav-kh" onclick="showPage('kh',this)"><span>&#x1F3AF;</span>Kế hoạch năm</div>
   <div class="ni" onclick="showPage('guide',this)"><span>&#x1F4D6;</span>Hướng dẫn</div>
   <div class="sfoot">
     <button class="sfbtn" onclick="doRefresh()">&#x1F504; Refresh</button>
     <button class="sfbtn" onclick="doExport()">&#x1F4E5; Xuất CSV</button>
-    <button class="sfbtn red" id="btn-logout" style="display:none" onclick="doLogout()">&#x1F513; Đăng xuất</button>
-    <button class="sfbtn" onclick="doChangeSrc()">&#x2699; Đổi nguồn</button>
+    <button class="sfbtn" onclick="openSettings()">&#x2699;&#xFE0F; Cài đặt</button>
+    <button class="sfbtn red" onclick="doLogout()">&#x1F513; Đăng xuất</button>
     <div class="lupd" id="lupd"></div>
   </div>
 </div>
@@ -289,7 +343,7 @@ button,input,select{font-family:inherit;}
     <!-- 4 KPI CARDS -->
     <div class="ov-kpi-row" id="ov-kpi-row"></div>
 
-    <!-- ROW 2: Bar chart luy ke + Tien do theo khoa -->
+    <!-- ROW 2: Bar chart luy ke + Tiến độ theo khoa -->
     <div class="ov-charts-row">
       <div class="ov-card">
         <div class="ov-ch">
@@ -438,7 +492,7 @@ button,input,select{font-family:inherit;}
   </div>
 
   <div class="page" id="page-input">
-    <div class="ntc info">&#x1F4CB; Chon khoa &#x2192; chon loai &#x2192; dien so vao bang &#x2192; <strong>Luu</strong>. Du lieu luu Supabase, thang truoc van giu nguyen.</div>
+    <div class="ntc info">&#x1F4CB; Chọn khoa &#x2192; chọn loại &#x2192; điền số vào bảng &#x2192; <strong>Luu</strong>. Du lieu luu Supabase, thang truoc van giu nguyen.</div>
     <div class="card">
       <div class="ch">
         <div class="ct">&#x270F; Nhập số liệu</div>
@@ -489,7 +543,8 @@ button,input,select{font-family:inherit;}
       <div class="cb" style="font-size:12px;line-height:1.9;color:#475569;">
         <p><strong style="color:var(--navy);">Bước 1</strong> &#x2014; Vao <strong>supabase.com</strong> &#x2192; Sign Up &#x2192; New Project</p>
         <p style="margin:8px 0;"><strong style="color:var(--navy);">Bước 2</strong> &#x2014; SQL Editor &#x2192; paste va chay doan SQL sau:</p>
-        <div class="sqlbox">create table if not exists bv_data (
+        <div class="sqlbox">-- Bảng số liệu thực hiện
+create table if not exists bv_data (
   id         bigserial primary key,
   year       int not null,
   month      int not null,
@@ -501,6 +556,7 @@ button,input,select{font-family:inherit;}
   unique(year, month, dept, indicator)
 );
 
+-- Bảng kế hoạch năm
 create table if not exists bv_kh (
   id         bigserial primary key,
   year       int not null,
@@ -511,15 +567,26 @@ create table if not exists bv_kh (
   unique(year, dept, indicator)
 );
 
+-- Bảng mật khẩu khoa
+create table if not exists bv_passwords (
+  dept     text primary key,
+  password text not null default '1'
+);
+
+-- Policies
 alter table bv_data enable row level security;
 alter table bv_kh   enable row level security;
+alter table bv_passwords enable row level security;
 
-create policy pub_read_data on bv_data for select using (true);
-create policy pub_read_kh   on bv_kh   for select using (true);
-create policy pub_ins_data  on bv_data for insert with check (true);
-create policy pub_ins_kh    on bv_kh   for insert with check (true);
-create policy pub_upd_data  on bv_data for update using (true);
-create policy pub_upd_kh    on bv_kh   for update using (true);</div>
+create policy pub_read_data  on bv_data      for select using (true);
+create policy pub_read_kh    on bv_kh        for select using (true);
+create policy pub_read_pw    on bv_passwords for select using (true);
+create policy pub_ins_data   on bv_data      for insert with check (true);
+create policy pub_ins_kh     on bv_kh        for insert with check (true);
+create policy pub_ins_pw     on bv_passwords for insert with check (true);
+create policy pub_upd_data   on bv_data      for update using (true);
+create policy pub_upd_kh     on bv_kh        for update using (true);
+create policy pub_upd_pw     on bv_passwords for update using (true);</div>
         <p><strong style="color:var(--navy);">Bước 3</strong> &#x2014; Project Settings &#x2192; API &#x2192; copy <strong>Project URL</strong> va <strong>anon public</strong> key &#x2192; dan vao man hinh Setup</p>
         <p style="margin-top:8px;"><strong style="color:var(--navy);">Bước 4</strong> &#x2014; Upload file HTML lên GitHub &#x2192; Deploy Vercel &#x2192; xong!</p>
         <div style="background:#D1FAE5;padding:10px 14px;border-radius:8px;color:#065F46;margin-top:12px;">
@@ -532,8 +599,15 @@ create policy pub_upd_kh    on bv_kh   for update using (true);</div>
 
 <script>
 
-var SB_URL='', SB_KEY='', SB_PASS='';
-var isAuthed=false;
+// Credentials ẩn trong code
+var SB_URL='https://qdgdesatsylisfdfamiy.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZ2Rlc2F0c3lsaXNmZGZhbWl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzODUyNzksImV4cCI6MjA5NDk2MTI3OX0.UqA9701cS1VwVKrBUEn4dHDNHC3dgWBAFkGfyhVeUwM';
+
+// Auth state
+var currentUser=null;   // null | 'admin' | 'TV' | 'CC' | ...
+var currentDept=null;   // null | 'TV' | 'CC' | ... (null = admin, xem tất cả)
+var PASSWORDS={};       // cache passwords từ Supabase
+var ADMIN_PW_KEY='bv_admin_pw';  // localStorage key cho admin
 var selYear=new Date().getFullYear(), selM=new Date().getMonth()+1, pt='thang';
 var l2m='k', selD='', selI='', l3v='kh', xhI='', xhD='';
 var inpTab='thuc';
@@ -541,34 +615,34 @@ var inpVals={};
 var khVals={};
 var DB={};
 var DB_KH={};
-var cDept=null,cTrend=null,cKHY=null,cPie=null;
+var cDept=null,cTrend=null,cKHY=null,cPie=null,cMini1=null,cMini2=null,cMini3=null;
 
 var INDS=[
-  {n:'Giuong-ke-hoach',      lb:'Gi\u01b0\u1eddng k\u1ebf ho\u1ea1ch',         dv:'Gi\u01b0\u1eddng',nh:'C\u00f4ng su\u1ea5t',   fix:true, avg:false},
-  {n:'Cong-suat-giuong',     lb:'C\u00f4ng su\u1ea5t gi\u01b0\u1eddng (%)',      dv:'%',       nh:'C\u00f4ng su\u1ea5t',   fix:true, avg:true},
-  {n:'Luot-kham-benh',       lb:'L\u01b0\u1ee3t kh\u00e1m b\u1ec7nh',           dv:'L\u01b0\u1ee3t',    nh:'Kh\u00e1m - \u0110T',  fix:false,avg:false},
-  {n:'BN-noi-tru',           lb:'BN n\u1ed9i tr\u00fa',                dv:'BN',      nh:'Kh\u00e1m - \u0110T',  fix:false,avg:false},
-  {n:'Ngay-dieu-tri-NT',     lb:'Ng\u00e0y \u0111i\u1ec1u tr\u1ecb NT',           dv:'Ng\u00e0y',     nh:'Kh\u00e1m - \u0110T',  fix:false,avg:false},
-  {n:'Ngay-DTNT-TB',         lb:'Ng\u00e0y \u0110TNT TB',               dv:'Ng\u00e0y',     nh:'Kh\u00e1m - \u0110T',  fix:true, avg:true},
-  {n:'BN-ngoai-tru',         lb:'BN ngo\u1ea1i tr\u00fa',               dv:'BN',      nh:'Kh\u00e1m - \u0110T',  fix:false,avg:false},
-  {n:'Huyet-hoc',            lb:'Huy\u1ebft h\u1ecdc',                dv:'XN',      nh:'X\u00e9t nghi\u1ec7m', fix:false,avg:false},
-  {n:'Sinh-hoa',             lb:'Sinh h\u00f3a',                   dv:'XN',      nh:'X\u00e9t nghi\u1ec7m', fix:false,avg:false},
-  {n:'Vi-sinh',              lb:'Vi sinh',                   dv:'XN',      nh:'X\u00e9t nghi\u1ec7m', fix:false,avg:false},
-  {n:'X-quang',              lb:'X-quang',                   dv:'L\u1ea7n',     nh:'C\u0110HA',       fix:false,avg:false},
-  {n:'CT-Scanner',           lb:'CT Scanner',                 dv:'L\u1ea7n',     nh:'C\u0110HA',       fix:false,avg:false},
-  {n:'Sieu-am',              lb:'Si\u00eau \u00e2m',                   dv:'L\u1ea7n',     nh:'C\u0110HA',       fix:false,avg:false},
-  {n:'Noi-soi',              lb:'N\u1ed9i soi',                   dv:'L\u1ea7n',     nh:'Th\u0103m d\u00f2',    fix:false,avg:false},
-  {n:'Do-CNHH',              lb:'\u0110o CNHH',                    dv:'L\u1ea7n',     nh:'Th\u0103m d\u00f2',    fix:false,avg:false},
-  {n:'Test-GPQ',             lb:'Test GPQ',                   dv:'L\u1ea7n',     nh:'Th\u0103m d\u00f2',    fix:false,avg:false},
-  {n:'PHCN-ho-hap',          lb:'PHCN h\u00f4 h\u1ea5p',               dv:'L\u1ea7n',     nh:'Ph\u1ee5c h\u1ed3i CN', fix:false,avg:false},
-  {n:'Thu-thuat',            lb:'Th\u1ee7 thu\u1eadt',                 dv:'Ca',      nh:'Th\u1ee7 thu\u1eadt',   fix:false,avg:false},
-  {n:'Dien-tim',             lb:'\u0110i\u1ec7n tim',                   dv:'L\u1ea7n',     nh:'Th\u0103m d\u00f2',    fix:false,avg:false},
+  {n:'Giuong-ke-hoach',      lb:'Giường kế hoạch',          dv:'Giường', nh:'Công suất',       fix:true, avg:false},
+  {n:'Cong-suat-giuong',     lb:'Công suất giường (%)',      dv:'%',      nh:'Công suất',       fix:true, avg:true},
+  {n:'Luot-kham-benh',       lb:'Lượt khám bệnh',            dv:'Lượt',   nh:'Khám - Điều trị', fix:false,avg:false},
+  {n:'BN-noi-tru',           lb:'BN nội trú',                dv:'BN',     nh:'Khám - Điều trị', fix:false,avg:false},
+  {n:'Ngay-dieu-tri-NT',     lb:'Ngày điều trị NT',          dv:'Ngày',   nh:'Khám - Điều trị', fix:false,avg:false},
+  {n:'Ngay-DTNT-TB',         lb:'Ngày ĐTNT TB',              dv:'Ngày',   nh:'Khám - Điều trị', fix:true, avg:true},
+  {n:'BN-ngoai-tru',         lb:'BN ngoại trú',              dv:'BN',     nh:'Khám - Điều trị', fix:false,avg:false},
+  {n:'Huyet-hoc',            lb:'Huyết học',                 dv:'XN',     nh:'Xét nghiệm',      fix:false,avg:false},
+  {n:'Sinh-hoa',             lb:'Sinh hóa',                  dv:'XN',     nh:'Xét nghiệm',      fix:false,avg:false},
+  {n:'Vi-sinh',              lb:'Vi sinh',                   dv:'XN',     nh:'Xét nghiệm',      fix:false,avg:false},
+  {n:'X-quang',              lb:'X-quang',                   dv:'Lần',    nh:'CĐHA',            fix:false,avg:false},
+  {n:'CT-Scanner',           lb:'CT Scanner',                dv:'Lần',    nh:'CĐHA',            fix:false,avg:false},
+  {n:'Sieu-am',              lb:'Siêu âm',                   dv:'Lần',    nh:'CĐHA',            fix:false,avg:false},
+  {n:'Noi-soi',              lb:'Nội soi',                   dv:'Lần',    nh:'Thăm dò',         fix:false,avg:false},
+  {n:'Do-CNHH',              lb:'Đo CNHH',                   dv:'Lần',    nh:'Thăm dò',         fix:false,avg:false},
+  {n:'Test-GPQ',             lb:'Test GPQ',                  dv:'Lần',    nh:'Thăm dò',         fix:false,avg:false},
+  {n:'PHCN-ho-hap',          lb:'PHCN hô hấp',               dv:'Lần',    nh:'Phục hồi CN',     fix:false,avg:false},
+  {n:'Thu-thuat',            lb:'Thủ thuật',                 dv:'Ca',     nh:'Thủ thuật',       fix:false,avg:false},
+  {n:'Dien-tim',             lb:'Điện tim',                  dv:'Lần',    nh:'Thăm dò',         fix:false,avg:false},
 ];
 var DEPTS=['TV','CC','YC','N1','N2','N3','N4','N5','KB','KB33','XN','CDHA'];
 var DL={
-  'TV':'To\u00e0n vi\u1ec7n','CC':'C\u1ea5p c\u1ee9u','YC':'Y\u00eau c\u1ea7u',
-  'N1':'N\u1ed9i 1','N2':'N\u1ed9i 2','N3':'N\u1ed9i 3','N4':'N\u1ed9i 4','N5':'N\u1ed9i 5',
-  'KB':'KB','KB33':'KB 33 L\u00ea \u0110\u1ea1i H\u00e0nh','XN':'X\u00e9t nghi\u1ec7m','CDHA':'C\u0110HA'
+  'TV':'Toàn viện','CC':'Cấp cứu','YC':'Yêu cầu',
+  'N1':'Nội 1','N2':'Nội 2','N3':'Nội 3','N4':'Nội 4','N5':'Nội 5',
+  'KB':'KB','KB33':'KB 33 Lê Đại Hành','XN':'Xét nghiệm','CDHA':'CĐHA'
 };
 function dl(d){return DL[d]||d;}
 function il(ind){return ind.lb||ind.n;}
@@ -655,7 +729,7 @@ async function doInit(){
     updateAuthUI();buildFilters();buildDeptSel();buildKHTbl();
     buildPUI();updateBadge();renderAll();
     document.getElementById('kh-yr').textContent=selYear;
-    document.getElementById('slo-yr').textContent='Nam '+selYear;
+    document.getElementById('slo-yr').textContent='Năm '+selYear;
     setInterval(function(){doRefresh();},5*60*1000);
     updateLupd();
   }catch(e){
@@ -665,16 +739,15 @@ async function doInit(){
   }
 }
 function updateLupd(){var now=new Date();document.getElementById('lupd').textContent='Cập nhật: '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');}
-function showSErr(m){var e=document.getElementById('serr');e.textContent=m;e.style.display=m?'block':'none';}
-function doChangeSrc(){localStorage.removeItem('bv_url');localStorage.removeItem('bv_key');document.getElementById('main').style.display='none';document.getElementById('setup').style.display='flex';}
+
+
 async function doRefresh(){await loadData();renderAll();if(document.getElementById('page-kh').classList.contains('active'))buildKHTbl();updateLupd();}
 
-function updateAuthUI(){document.getElementById('btn-logout').style.display=(isAuthed&&SB_PASS)?'flex':'none';}
+
 function showPage(id,el){
-  if((id==='input'||id==='kh')&&SB_PASS&&!isAuthed){
-    document.getElementById('auth-modal').style.display='flex';
-    setTimeout(function(){document.getElementById('auth-pw').focus();},80);
-    document.getElementById('auth-modal')._t={id:id,el:el};
+  // Chỉ admin mới vào nhập liệu và kế hoạch
+  if((id==='input'||id==='kh')&&currentUser!=='admin'){
+    alert('Chức năng này chỉ dành cho Phòng Kế hoạch Tổng hợp!');
     return;
   }
   doShow(id,el);
@@ -691,26 +764,13 @@ function doShow(id,el){
   if(id==='input') buildInpTbl();
   if(id==='kh') buildKHTbl();
 }
-function doAuth(){
-  var p=document.getElementById('auth-pw').value;
-  var ae=document.getElementById('aerr');
-  if(p===SB_PASS){
-    isAuthed=true;localStorage.setItem('bv_auth','1');
-    document.getElementById('auth-modal').style.display='none';
-    document.getElementById('auth-pw').value='';
-    ae.style.display='none';
-    updateAuthUI();
-    var t=document.getElementById('auth-modal')._t;
-    if(t) doShow(t.id,t.el);
-  }else{ae.style.display='block';}
-}
-function doLogout(){isAuthed=false;localStorage.removeItem('bv_auth');updateAuthUI();doShow('kpi',document.querySelector('.ni'));}
+// doAuth + doLogout handled by new auth system
 
 function buildPUI(){
   var items=[],vals=[],def=0;
   if(pt==='thang'){for(var i=1;i<=12;i++){items.push('T'+i);vals.push(i);}def=selM-1;}
   else if(pt==='quy'){items=['Quý 1','Quý 2','Quý 3','Quý 4'];vals=[3,6,9,12];}
-  else{items=['3 thang','6 thang','9 thang','Ca nam'];vals=[3,6,9,12];def=1;}
+  else{items=['3 tháng','6 tháng','9 tháng','Cả năm'];vals=[3,6,9,12];def=1;}
   selM=vals[def];
   document.getElementById('sp').innerHTML=items.map(function(l,i){
     return '<button class="sb2'+(vals[i]===selM?' active':'')+'" onclick="setSub('+vals[i]+',this)">'+l+'</button>';
@@ -720,25 +780,27 @@ function buildPUI(){
 function setPT(t,btn){pt=t;document.querySelectorAll('.pb').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');buildPUI();renderAll();}
 function setSub(m,btn){selM=m;document.querySelectorAll('.sb2').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');updateBadge();renderAll();}
 function updateBadge(){
-  var lbl=pt==='thang'?'Tháng '+selM+'/'+selYear:pt==='quy'?'Quý '+([3,6,9,12].indexOf(selM)+1)+'/'+selYear:selM+' thang/'+selYear;
+  var lbl=pt==='thang'?'Tháng '+selM+'/'+selYear:pt==='quy'?'Quý '+([3,6,9,12].indexOf(selM)+1)+'/'+selYear:selM+' tháng/'+selYear;
   document.getElementById('tb-badge').textContent=lbl;
   document.getElementById('l3-per').textContent=lbl;
 }
 function setYear(y){
   if(isNaN(y)||y<2000||y>2099) return;
   selYear=y;
-  document.getElementById('slo-yr').textContent='Nam '+y;
+  document.getElementById('slo-yr').textContent='Năm '+y;
   document.getElementById('kh-yr').textContent=y;
   loadData().then(function(){renderAll();buildKHTbl();});
 }
 function buildFilters(){
   document.getElementById('xh-if').innerHTML=INDS.map(function(ind){return '<button class="fc'+(ind.n===xhI?' active':'')+'" data-v="'+ind.n+'" onclick="pickXhI(this)">'+il(ind)+'</button>';}).join('');
-  document.getElementById('xh-df').innerHTML=DEPTS.map(function(d){return '<button class="fc'+(d===xhD?' active':'')+'" data-v="'+d+'" onclick="pickXhD(this)">'+dl(d)+'</button>';}).join('');
+  var visD=getVisibleDepts();
+  document.getElementById('xh-df').innerHTML=visD.map(function(d){return '<button class="fc'+(d===xhD?' active':'')+'" data-v="'+d+'" onclick="pickXhD(this)">'+dl(d)+'</button>';}).join('');
   buildL2F();
 }
 function buildL2F(){
   var w=document.getElementById('l2f');
-  if(l2m==='k') w.innerHTML=DEPTS.map(function(d){return '<button class="fc'+(d===selD?' active':'')+'" data-v="'+d+'" onclick="pickL2D(this)">'+dl(d)+'</button>';}).join('');
+  var vD=getVisibleDepts();
+  if(l2m==='k') w.innerHTML=vD.map(function(d){return '<button class="fc'+(d===selD?' active':'')+'" data-v="'+d+'" onclick="pickL2D(this)">'+dl(d)+'</button>';}).join('');
   else w.innerHTML=INDS.map(function(ind){return '<button class="fc'+(ind.n===selI?' active':'')+'" data-v="'+ind.n+'" onclick="pickL2I(this)">'+il(ind)+'</button>';}).join('');
 }
 function setL2M(m,btn){l2m=m;document.querySelectorAll('.mb').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');buildL2F();renderL2();}
@@ -756,7 +818,8 @@ function barHtml(lbl,pct,col,fw,vs,p50,p100,pe){
 
 function renderKPI(){
   var months=getMonths(), lastM=months[months.length-1], e=expV(lastM);
-  var tv=DEPTS[0];
+  // Nếu là khoa, hiện KPI của khoa đó; nếu admin hiện Toàn viện
+  var tv=currentDept?currentDept:DEPTS[0];
   var now=new Date();
   var monthNames=['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
 
@@ -772,7 +835,7 @@ function renderKPI(){
 
   // ═══ 4 KPI CARDS lớn ═══
   var KPI4=[
-    {pat:'kham',   lbl:'Lượt khám bệnh', u:'luot', ico:'&#x1F3E5;', bg:'#EFF6FF', ic_bg:'#BFDBFE'},
+    {pat:'kham',   lbl:'Lượt khám bệnh', u:'lượt', ico:'&#x1F3E5;', bg:'#EFF6FF', ic_bg:'#BFDBFE'},
     {pat:'noi-tru',lbl:'BN nội trú',     u:'BN',   ico:'&#x1F6CF;', bg:'#F0FDF4', ic_bg:'#BBF7D0'},
     {pat:'huyet',  lbl:'Xét nghiệm',     u:'XN',   ico:'&#x1F9EA;', bg:'#FFF7ED', ic_bg:'#FED7AA'},
     {pat:'thuat',  lbl:'Thủ thuật',      u:'Ca',   ico:'&#x2695;',  bg:'#F5F3FF', ic_bg:'#DDD6FE'},
@@ -803,7 +866,8 @@ function renderKPI(){
   var i0=INDS.filter(function(x){return x.n.indexOf('kham')>=0;})[0]||INDS[0];
   var dchEl=document.getElementById('dept-cht-ttl');
   if(dchEl) dchEl.textContent=il(i0)+' theo khoa';
-  var noAll=DEPTS.slice(1);
+  // Admin: xem tất cả khoa; Khoa: chỉ xem mình so với toàn viện
+  var noAll=currentDept?[DEPTS[0],currentDept]:DEPTS.slice(1);
   var vals=noAll.map(function(d){return gdAgg(d,i0).t;});
   var colors=noAll.map(function(d){return gh(Math.round(gdAgg(d,i0).pkn*100));});
   var cDeptEl=document.getElementById('cDept');
@@ -830,8 +894,10 @@ function renderKPI(){
     var canvasEl=document.getElementById(mi.id);
     if(!canvasEl) return;
     // Destroy old chart
-    if(canvasEl._chart){canvasEl._chart.destroy();}
-    canvasEl._chart=new Chart(canvasEl.getContext('2d'),{
+    if(idx2===0&&cMini1){cMini1.destroy();cMini1=null;}
+    if(idx2===1&&cMini2){cMini2.destroy();cMini2=null;}
+    if(idx2===2&&cMini3){cMini3.destroy();cMini3=null;}
+    var mc=new Chart(canvasEl.getContext('2d'),{
       type:'bar',
       data:{labels:labs,datasets:[{
         data:mVals,
@@ -843,8 +909,8 @@ function renderKPI(){
         plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return fmt(c.raw);}}}},
         scales:{x:{ticks:{font:{size:8}}},y:{ticks:{font:{size:8},callback:function(v){return v>=1000?Math.round(v/1000)+'k':v;}},grid:{color:'#F1F5F9'}}}}
     });
+    if(idx2===0)cMini1=mc;else if(idx2===1)cMini2=mc;else cMini3=mc;
   });
-
   // ═══ Trạng thái chỉ tiêu (Recent activity style) ═══
   var recentEl=document.getElementById('ov-recent');
   if(recentEl){
@@ -865,8 +931,10 @@ function renderL2(){
   document.getElementById('l2-ax').innerHTML=[0,50,100,130].map(function(t){return '<span class="atk" style="left:'+p2p(t)+'%">'+t+'%</span>';}).join('');
   var p50=p2p(50),p100=p2p(100),pe=p2p(e);
   var rows=[];
+  // Khoa chỉ xem khoa mình
+  if(currentDept) selD=currentDept;
   if(l2m==='k'){
-    document.getElementById('l2-ttl').textContent='% dat KH - '+dl(selD);
+    document.getElementById('l2-ttl').textContent='% đạt KH - '+dl(selD);
     document.getElementById('l2-sub').textContent='Tất cả chỉ tiêu';
     rows=INDS.map(function(ind){var d=gdAgg(selD,ind);return {lbl:il(ind),pkn:d.pkn,pck:d.pck};});
   }else{
@@ -882,7 +950,7 @@ function renderL2(){
 }
 
 function renderL3(){
-  var showD=DEPTS.slice(0,7);
+  var showD=currentDept?[DEPTS[0],currentDept]:DEPTS.slice(0,7);
   var h='<thead><tr><th>Chỉ tiêu</th>';
   showD.forEach(function(d){h+='<th colspan="2">'+dl(d)+'</th>';});
   h+='</tr><tr><th></th>';
@@ -936,7 +1004,7 @@ function renderXH(){
 }
 
 function renderFin(){
-  var tv=DEPTS[0],grp={};
+  var tv=currentDept?currentDept:DEPTS[0],grp={};
   INDS.forEach(function(ind){
     var d=gdAgg(tv,ind),nh=ind.nh;
     if(!grp[nh]) grp[nh]={t:0,k:0,c:0};
@@ -1101,7 +1169,7 @@ async function doSaveKH(){
   if(!ups.length){showKHMsg('Chưa có thay đổi!','err');return;}
   try{
     await sbFetch('bv_kh',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:ups});
-    khVals={};await loadData();buildKHTbl();renderAll();
+    khVals={};await doRefresh();buildKHTbl();
     showKHMsg('Đã lưu '+ups.length+' KH năm '+selYear,'ok');
   }catch(e){showKHMsg('Lỗi: '+e.message,'err');}
 }
@@ -1126,15 +1194,193 @@ function doExport(){
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BaoCao_'+selYear+'.csv';a.click();
 }
 
+/* ══════════ AUTH SYSTEM ══════════ */
+
+function showLoginScreen(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('main').style.display='none';
+  setTimeout(function(){document.getElementById('login-pw').focus();},200);
+}
+
+async function doLogin(){
+  var dept=document.getElementById('login-dept').value;
+  var pw=document.getElementById('login-pw').value;
+  var errEl=document.getElementById('login-err');
+  errEl.style.display='none';
+
+  if(!pw){errEl.textContent='Vui lòng nhập mật khẩu!';errEl.style.display='block';return;}
+
+  // Load passwords từ Supabase (bảng bv_passwords)
+  try{
+    var pws=await sbFetch('bv_passwords?select=dept,password');
+    PASSWORDS={};
+    (pws||[]).forEach(function(r){PASSWORDS[r.dept]=r.password;});
+    // Mặc định = '1' nếu chưa đặt
+  }catch(e){
+    // Nếu bảng chưa tồn tại, dùng mặc định
+    PASSWORDS={};
+  }
+
+  // Kiểm tra mật khẩu
+  var correct=false;
+  if(dept==='admin'){
+    var adminPw=localStorage.getItem(ADMIN_PW_KEY)||PASSWORDS['admin']||'admin123';
+    correct=(pw===adminPw);
+  }else{
+    var deptPw=PASSWORDS[dept]||'1';
+    correct=(pw===deptPw);
+  }
+
+  if(!correct){
+    errEl.textContent='Mật khẩu không đúng! Mặc định là: 1';
+    errEl.style.display='block';
+    document.getElementById('login-pw').value='';
+    document.getElementById('login-pw').focus();
+    return;
+  }
+
+  // Đăng nhập thành công
+  currentUser=dept;
+  currentDept=(dept==='admin')?null:dept;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('loading').style.display='flex';
+
+  // Cập nhật user badge
+  var deptLabel=dept==='admin'?'KHTH (Admin)':DL[dept]||dept;
+  document.getElementById('user-name').textContent=deptLabel;
+  document.getElementById('user-ico').textContent=dept==='admin'?'👑':'🏥';
+
+  // Load data và init
+  await doInit();
+
+  // Ẩn/hiện menu theo quyền
+  updateMenuByRole();
+}
+
+function updateMenuByRole(){
+  var isAdmin=(currentUser==='admin');
+  // Chỉ admin mới thấy tab nhập liệu, kế hoạch
+  var inputNav=document.getElementById('nav-input');
+  var khNav=document.getElementById('nav-kh');
+  if(inputNav) inputNav.style.display=isAdmin?'flex':'none';
+  if(khNav) khNav.style.display=isAdmin?'flex':'none';
+  // Ẩn nút xuất CSV với khoa (chỉ admin mới xuất)
+  // (giữ nguyên - tất cả xem được)
+}
+
+function doLogout(){
+  currentUser=null;currentDept=null;
+  document.getElementById('main').style.display='none';
+  document.getElementById('login-pw').value='';
+  document.getElementById('login-err').style.display='none';
+  showLoginScreen();
+}
+
+function openSettings(){
+  var modal=document.getElementById('settings-modal');
+  var isAdmin=(currentUser==='admin');
+  document.getElementById('settings-admin').style.display=isAdmin?'block':'none';
+  document.getElementById('settings-dept').style.display=isAdmin?'none':'block';
+  document.getElementById('settings-msg').style.display='none';
+  if(isAdmin){
+    buildSettingsDeptList();
+  }else{
+    var dLabel=DL[currentUser]||currentUser;
+    document.getElementById('settings-dept-name').textContent='Đổi mật khẩu cho: '+dLabel;
+    document.getElementById('cur-pw').value='';
+    document.getElementById('new-pw').value='';
+    document.getElementById('confirm-pw').value='';
+  }
+  modal.style.display='flex';
+}
+
+function buildSettingsDeptList(){
+  var depts=['TV','CC','YC','N1','N2','N3','N4','N5','KB','KB33','XN','CDHA'];
+  var html='';
+  depts.forEach(function(d){
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
+    html+='<label style="font-size:12px;font-weight:500;color:#1B2A4A;width:160px;flex-shrink:0;">'+( DL[d]||d)+'</label>';
+    html+='<input type="password" placeholder="Mật khẩu mới (trống=giữ nguyên)" data-dept="'+d+'" ';
+    html+='style="flex:1;padding:6px 9px;border:1.5px solid #E2E8F0;border-radius:6px;font-size:11px;outline:none;font-family:inherit;">';
+    html+='<span style="font-size:10px;color:#94A3B8;">Hiện: '+(PASSWORDS[d]||'1')+'</span>';
+    html+='</div>';
+  });
+  document.getElementById('settings-dept-list').innerHTML=html;
+}
+
+async function saveAllPasswords(){
+  var newAdminPw=document.getElementById('new-admin-pw').value.trim();
+  if(newAdminPw){
+    localStorage.setItem(ADMIN_PW_KEY,newAdminPw);
+  }
+  var inputs=document.querySelectorAll('#settings-dept-list input[data-dept]');
+  var upserts=[];
+  inputs.forEach(function(inp){
+    var d=inp.getAttribute('data-dept');
+    var pw=inp.value.trim();
+    if(pw){
+      upserts.push({dept:d,password:pw});
+      PASSWORDS[d]=pw;
+    }
+  });
+  if(!upserts.length&&!newAdminPw){showSettingsMsg('Không có thay đổi nào!','err');return;}
+  try{
+    if(upserts.length){
+      await sbFetch('bv_passwords',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:upserts});
+    }
+    showSettingsMsg('Đã lưu mật khẩu thành công!','ok');
+    setTimeout(function(){document.getElementById('settings-modal').style.display='none';},1500);
+  }catch(e){
+    // Nếu bảng chưa có, lưu local
+    upserts.forEach(function(u){PASSWORDS[u.dept]=u.password;localStorage.setItem('bv_pw_'+u.dept,u.password);});
+    showSettingsMsg('Đã lưu local (chạy SQL tạo bảng bv_passwords để lưu online)','ok');
+  }
+}
+
+async function changeDeptPassword(){
+  var curPw=document.getElementById('cur-pw').value;
+  var newPw=document.getElementById('new-pw').value;
+  var confirmPw=document.getElementById('confirm-pw').value;
+  var deptPw=PASSWORDS[currentUser]||localStorage.getItem('bv_pw_'+currentUser)||'1';
+  if(curPw!==deptPw){showSettingsMsg('Mật khẩu hiện tại không đúng!','err');return;}
+  if(!newPw){showSettingsMsg('Vui lòng nhập mật khẩu mới!','err');return;}
+  if(newPw!==confirmPw){showSettingsMsg('Mật khẩu xác nhận không khớp!','err');return;}
+  try{
+    await sbFetch('bv_passwords',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:[{dept:currentUser,password:newPw}]});
+    PASSWORDS[currentUser]=newPw;
+    showSettingsMsg('Đổi mật khẩu thành công!','ok');
+    setTimeout(function(){document.getElementById('settings-modal').style.display='none';},1500);
+  }catch(e){
+    localStorage.setItem('bv_pw_'+currentUser,newPw);
+    PASSWORDS[currentUser]=newPw;
+    showSettingsMsg('Đã lưu! (offline mode)','ok');
+  }
+}
+
+function showSettingsMsg(msg,type){
+  var el=document.getElementById('settings-msg');
+  el.textContent=msg;
+  el.style.display='block';
+  el.style.background=type==='ok'?'#D1FAE5':'#FEE2E2';
+  el.style.color=type==='ok'?'#065F46':'#991B1B';
+}
+
+/* ══ FILTER DATA BY DEPT ══ */
+function getVisibleDepts(){
+  // Admin xem tất cả, khoa chỉ xem mình
+  if(!currentDept) return DEPTS;
+  return [currentDept];
+}
+
+function getVisibleDeptsNoAll(){
+  if(!currentDept) return DEPTS.slice(1);
+  return [currentDept];
+}
+
+
 window.addEventListener('load',function(){
-  var url=localStorage.getItem('bv_url')||'https://qdgdesatsylisfdfamiy.supabase.co';
-  var key=localStorage.getItem('bv_key')||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZ2Rlc2F0c3lsaXNmZGZhbWl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzODUyNzksImV4cCI6MjA5NDk2MTI3OX0.UqA9701cS1VwVKrBUEn4dHDNHC3dgWBAFkGfyhVeUwM';
-  SB_URL=url;SB_KEY=key;SB_PASS=localStorage.getItem('bv_pass')||'';
-  localStorage.setItem('bv_url',url);
-  localStorage.setItem('bv_key',key);
-  document.getElementById('sb-url').value=url;
-  document.getElementById('sb-key').value=key;
-  doInit();
+  // Không hiện setup screen, auto load passwords rồi show login
+  showLoginScreen();
 });
 
 </script>
