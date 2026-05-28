@@ -12,6 +12,7 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);}
 button,input,select{font-family:inherit;}
+select option{color:#1E293B;background:#fff;}
 #setup{position:fixed;inset:0;background:var(--navy);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;}
 .sbox{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.13);border-radius:20px;padding:38px 46px;max-width:540px;width:100%;}
 .slogo{font-size:34px;margin-bottom:10px;}
@@ -187,6 +188,13 @@ button,input,select{font-family:inherit;}
 .ov-recent-time{font-size:10px;color:var(--sub);flex-shrink:0;}
 .ov-two{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 
+.l3tbl{table-layout:fixed;min-width:1500px;}
+.l3tbl th:first-child,.l3tbl td:first-child{position:sticky;left:0;z-index:6;width:170px;min-width:170px;max-width:170px;background:#fff;box-shadow:1px 0 0 var(--border);white-space:normal;line-height:1.25;}
+.l3tbl thead th:first-child{z-index:8;background:var(--navy);color:#fff;}
+.l3tbl th.dept-h{min-width:128px;width:128px;}
+.l3tbl th.metric-h{min-width:64px;width:64px;padding:5px 4px;}
+.l3tbl td.metric-v{min-width:64px;width:64px;padding:5px 4px;}
+.l3tbl .pc{padding:2px 5px;min-width:32px;text-align:center;}
 </style>
 </head>
 <body>
@@ -196,15 +204,14 @@ button,input,select{font-family:inherit;}
   <div style="width:100%;max-width:420px;">
     <div style="text-align:center;margin-bottom:28px;">
       <div style="font-size:48px;margin-bottom:12px;">🏥</div>
-      <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:5px;">Báo cáo Bệnh viện</div>
+      <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:5px;">Phòng Kế hoạch tổng hợp</div>
       <div style="font-size:13px;color:rgba(255,255,255,.45);">Vui lòng đăng nhập để tiếp tục</div>
     </div>
     <div style="background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.13);border-radius:16px;padding:28px 30px;">
       <div style="margin-bottom:14px;">
         <label style="font-size:10px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px;">Khoa / Phòng</label>
         <select id="login-dept" style="width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:13px;outline:none;font-family:inherit;">
-          <option value="admin">🔑 Phòng Kế hoạch Tổng hợp (Admin)</option>
-          <option value="TV">Toàn viện</option>
+          <option value="admin">🔑 Phòng Kế hoạch Tổng hợp</option>
           <option value="CC">Cấp cứu</option>
           <option value="YC">Yêu cầu</option>
           <option value="N1">Nội 1</option>
@@ -212,8 +219,8 @@ button,input,select{font-family:inherit;}
           <option value="N3">Nội 3</option>
           <option value="N4">Nội 4</option>
           <option value="N5">Nội 5</option>
-          <option value="KB">KB</option>
-          <option value="KB33">KB 33 Lê Đại Hành</option>
+          <option value="KB">Khoa Khám BệnhB</option>
+          <option value="KB33">KKB 33 Lê Đại Hành</option>
           <option value="XN">Xét nghiệm</option>
           <option value="CDHA">CĐHA</option>
         </select>
@@ -227,9 +234,6 @@ button,input,select{font-family:inherit;}
         🔐 Đăng nhập
       </button>
       <div id="login-err" style="margin-top:10px;padding:8px 12px;background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.35);border-radius:7px;color:#FCA5A5;font-size:12px;display:none;text-align:center;"></div>
-    </div>
-    <div style="text-align:center;margin-top:14px;font-size:10px;color:rgba(255,255,255,.2);">
-      Mật khẩu mặc định: <strong style="color:rgba(255,255,255,.4);">1</strong> &nbsp;|&nbsp; Đổi mật khẩu trong ⚙️ Cài đặt
     </div>
   </div>
 </div>
@@ -471,53 +475,41 @@ button,input,select{font-family:inherit;}
 
   <!-- PHẦN NHẬP LIỆU ĐÃ ĐƯỢC THIẾT KẾ LẠI -->
   <div class="page" id="page-input">
-    <div class="ntc info">&#x1F4CB; Chọn Tháng và Khoa để nhập số liệu. Dữ liệu tự động lưu đè lên dữ liệu cũ của tháng đó khi bấm nút Lưu.</div>
+    <div class="ntc info" style="display:flex; justify-content:space-between; align-items:center;">
+      <span>&#x1F4CB; Bảng tổng hợp số liệu thực tế theo Tháng. Bấm nút bên phải để mở form nhập số.</span>
+      <button onclick="openInputModal()" style="padding:8px 16px; background:#2563EB; color:#fff; border:none; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; box-shadow:0 2px 4px rgba(37,99,235,0.2);">+ Nhập / Sửa số liệu</button>
+    </div>
+    
     <div class="card">
       <div class="ch">
-        <div class="ct">&#x270F; Nhập số liệu hàng tháng</div>
+        <div class="ct">&#x1F5BE; Ma trận dữ liệu Tháng</div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:5px;">
             <span style="font-size:10px;font-weight:600;color:var(--sub);">THÁNG</span>
-            <select id="inp-month" style="padding:5px 9px;border-radius:6px;font-size:12px;border:1px solid var(--border);" onchange="buildInpTbl()">
-              <!-- JS sẽ render options từ 1-12 -->
-            </select>
+            <select id="view-month" style="padding:5px 9px;border-radius:6px;font-size:12px;border:1px solid var(--border);" onchange="buildInpView()"></select>
           </div>
           <div style="display:flex;align-items:center;gap:5px;">
             <span style="font-size:10px;font-weight:600;color:var(--sub);">KHOA</span>
-            <select id="inp-dept" style="padding:5px 9px;border-radius:6px;font-size:12px;border:1px solid var(--border);" onchange="buildInpTbl()"></select>
+            <select id="view-dept" style="padding:5px 9px;border-radius:6px;font-size:12px;border:1px solid var(--border);" onchange="buildInpView()">
+              <option value="ALL">Toàn viện (Xem tất cả các khoa)</option>
+              </select>
           </div>
         </div>
       </div>
-      <div class="cb" style="padding:8px 0;">
-        <div class="inp-wrap">
-          <table class="inp-tbl" id="inp-tbl">
-            <thead>
-              <tr>
-                <th class="ih">Chỉ tiêu</th>
-                <th class="dh">ĐV</th>
-                <th style="background:#1D4ED8; width: 120px;">Thực hiện</th>
-                <th style="background:#D97706; width: 120px;">Cùng kỳ (Năm ngoái)</th>
-              </tr>
-            </thead>
-            <tbody id="inp-body"></tbody>
+      
+      <div class="cb" style="padding:0; overflow-x:auto;">
+        <table class="dtbl" id="matrix-tbl" style="min-width: 800px;">
           </table>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;padding:10px 15px;">
-          <button class="svbtn" id="sv-btn" onclick="doSave()">&#x1F4BE; Lưu dữ liệu</button>
-          <button class="clbtn" onclick="doClear()">&#x1F5D1; Hoàn tác (Xóa form)</button>
-          <span id="inp-stat" style="font-size:11px;color:var(--sub);"></span>
-        </div>
-        <div id="sv-msg" style="padding:0 15px;"></div>
       </div>
     </div>
   </div>
 
   <div class="page" id="page-kh">
-    <div class="ntc warn">&#x1F3AF; Nhập KH năm cho từng chỉ tiêu x từng khoa. Dashboard sẽ tự tính % đạt và kỳ vọng.</div>
+    <div class="ntc warn" style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><span>&#x1F3AF; Bảng tổng hợp kế hoạch năm theo từng khoa/phòng.</span><button onclick="openKHModal()" style="padding:8px 16px;background:#2563EB;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">+ Nhập / Sửa KH năm</button></div>
     <div class="card">
       <div class="ch">
         <div><div class="ct">&#x1F3AF; Kế hoạch năm <span id="kh-yr"></span></div></div>
-        <button class="svbtn" onclick="doSaveKH()" style="font-size:12px;padding:6px 16px;">&#x1F4BE; Lưu KH</button>
+        <button class="svbtn" onclick="openKHModal()" style="font-size:12px;padding:6px 16px;">+ Nhập / Sửa KH</button>
       </div>
       <div class="cb" style="padding:0;overflow-x:auto;"><table class="dtbl" id="kh-tbl"></table></div>
       <div style="padding:10px 15px;"><div id="kh-msg"></div></div>
@@ -577,10 +569,93 @@ create policy pub_upd_pw     on bv_passwords for update using (true);</div>
         <p><strong style="color:var(--navy);">Bước 3</strong> &#x2014; Project Settings &#x2192; API &#x2192; copy <strong>Project URL</strong> và <strong>anon public</strong> key &#x2192; dán vào mã nguồn</p>
         <p style="margin-top:8px;"><strong style="color:var(--navy);">Bước 4</strong> &#x2014; Upload file HTML lên GitHub &#x2192; Deploy Vercel &#x2192; xong!</p>
       </div>
-    </div>
+</div>
   </div>
 </div>
 
+<div id="input-modal" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.75); z-index:9999; align-items:center; justify-content:center; backdrop-filter: blur(4px);">
+  <div style="background:#fff; border-radius:16px; width:95%; max-width:700px; max-height:90vh; display:flex; flex-direction:column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+    
+    <div style="padding:16px 24px; border-bottom:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center; background: #F8FAFC; border-radius: 16px 16px 0 0;">
+      <div>
+        <h3 style="font-size:16px; font-weight:700; color:#1E293B; margin-bottom: 2px;">✍️ Cập nhật số liệu</h3>
+        <div style="font-size:11px; color:#64748B;">Điền số thực hiện và cùng kỳ. Dữ liệu sẽ tự động lưu đè lên tháng cũ.</div>
+      </div>
+      <button onclick="document.getElementById('input-modal').style.display='none'" style="background:#F1F5F9; border:none; width:32px; height:32px; border-radius:50%; font-size:14px; cursor:pointer; color:#64748B; transition:0.2s;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">✕</button>
+    </div>
+
+    <div style="padding:16px 24px; display:flex; gap:12px; background: #fff; border-bottom:1px solid #E2E8F0;">
+      <div style="flex:1;">
+        <label style="font-size:10px; font-weight:700; color:#64748B; display:block; margin-bottom:4px;">NĂM BÁO CÁO</label>
+        <input id="pop-year" type="number" min="2000" max="2099" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #CBD5E1; font-size:13px; outline:none;" onchange="setPopupYear(this.value)">
+      </div>
+      <div style="flex:1;">
+        <label style="font-size:10px; font-weight:700; color:#64748B; display:block; margin-bottom:4px;">THÁNG BÁO CÁO</label>
+        <select id="pop-month" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #CBD5E1; font-size:13px; outline:none;" onchange="fillPopupData()"></select>
+      </div>
+      <div style="flex:1;">
+        <label style="font-size:10px; font-weight:700; color:#64748B; display:block; margin-bottom:4px;">KHOA / PHÒNG</label>
+        <select id="pop-dept" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #CBD5E1; font-size:13px; outline:none;" onchange="fillPopupData()"></select>
+      </div>
+    </div>
+
+    <div style="flex:1; overflow-y:auto; padding:16px 24px; background:#F8FAFC;">
+      <table style="width:100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <thead>
+          <tr>
+            <th style="text-align:left; padding:10px 12px; font-size:11px; color:#fff; background:#1E293B; width:40%;">Chỉ tiêu</th>
+            <th style="text-align:center; padding:10px 8px; font-size:11px; color:#fff; background:#1E293B; width:10%;">ĐV</th>
+            <th style="text-align:center; padding:10px 12px; font-size:11px; color:#fff; background:#2563EB; width:25%;">Thực hiện</th>
+            <th style="text-align:center; padding:10px 12px; font-size:11px; color:#fff; background:#D97706; width:25%;">Cùng kỳ (tự động)</th>
+          </tr>
+        </thead>
+        <tbody id="pop-body"></tbody>
+      </table>
+    </div>
+
+    <div style="padding:16px 24px; border-top:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center; background: #fff; border-radius: 0 0 16px 16px;">
+      <div id="pop-msg" style="font-size:12px; font-weight:500;"></div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="document.getElementById('input-modal').style.display='none'" style="padding:10px 16px; border-radius:8px; background:#F1F5F9; color:#475569; font-size:13px; font-weight:600; border:none; cursor:pointer;">Hủy bỏ</button>
+        <button id="pop-save-btn" onclick="savePopupData()" style="padding:10px 20px; border-radius:8px; background:#2563EB; color:#fff; font-size:13px; font-weight:600; border:none; cursor:pointer; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);">💾 Lưu dữ liệu</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="kh-modal" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.75); z-index:9999; align-items:center; justify-content:center; backdrop-filter: blur(4px);">
+  <div style="background:#fff; border-radius:16px; width:95%; max-width:680px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 25px 50px -12px rgba(0,0,0,.25);">
+    <div style="padding:16px 24px; border-bottom:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center; background:#F8FAFC; border-radius:16px 16px 0 0;">
+      <div>
+        <h3 style="font-size:16px; font-weight:700; color:#1E293B; margin-bottom:2px;">🎯 Cập nhật kế hoạch năm</h3>
+        <div style="font-size:11px; color:#64748B;">Nhập kế hoạch năm cho từng chỉ tiêu của một khoa/phòng.</div>
+      </div>
+      <button onclick="document.getElementById('kh-modal').style.display='none'" style="background:#F1F5F9; border:none; width:32px; height:32px; border-radius:50%; font-size:14px; cursor:pointer; color:#64748B;">✕</button>
+    </div>
+    <div style="padding:16px 24px; display:flex; gap:12px; background:#fff; border-bottom:1px solid #E2E8F0;">
+      <div style="flex:1;">
+        <label style="font-size:10px; font-weight:700; color:#64748B; display:block; margin-bottom:4px;">NĂM KẾ HOẠCH</label>
+        <input id="kh-pop-year" type="number" min="2000" max="2099" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #CBD5E1; font-size:13px; outline:none;" onchange="setKHYear(this.value)">
+      </div>
+      <div style="flex:1;">
+        <label style="font-size:10px; font-weight:700; color:#64748B; display:block; margin-bottom:4px;">KHOA / PHÒNG</label>
+        <select id="kh-pop-dept" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #CBD5E1; font-size:13px; outline:none;" onchange="fillKHPopup()"></select>
+      </div>
+    </div>
+    <div style="flex:1; overflow-y:auto; padding:16px 24px; background:#F8FAFC;">
+      <table style="width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.1);">
+        <thead><tr><th style="text-align:left; padding:10px 12px; font-size:11px; color:#fff; background:#1E293B; width:55%;">Chỉ tiêu</th><th style="text-align:center; padding:10px 8px; font-size:11px; color:#fff; background:#1E293B; width:10%;">ĐV</th><th style="text-align:center; padding:10px 12px; font-size:11px; color:#fff; background:#2563EB; width:35%;">KH năm</th></tr></thead>
+        <tbody id="kh-pop-body"></tbody>
+      </table>
+    </div>
+    <div style="padding:16px 24px; border-top:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center; background:#fff; border-radius:0 0 16px 16px;">
+      <div id="kh-pop-msg" style="font-size:12px; font-weight:500;"></div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="document.getElementById('kh-modal').style.display='none'" style="padding:10px 16px; border-radius:8px; background:#F1F5F9; color:#475569; font-size:13px; font-weight:600; border:none; cursor:pointer;">Hủy bỏ</button>
+        <button id="kh-pop-save-btn" onclick="doSaveKH()" style="padding:10px 20px; border-radius:8px; background:#2563EB; color:#fff; font-size:13px; font-weight:600; border:none; cursor:pointer;">💾 Lưu KH</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 
 // Credentials ẩn trong code
@@ -590,8 +665,8 @@ var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 // Auth state
 var currentUser=null;   
 var currentDept=null;   
-var PASSWORDS={};       
-var ADMIN_PW_KEY='bv_admin_pw';  
+var PASSWORDS={};
+var DEFAULT_YEAR_KEY='__default_year';
 var selYear=new Date().getFullYear(), selM=new Date().getMonth()+1, pt='thang';
 var l2m='k', selD='', selI='', l3v='kh', xhI='', xhD='';
 var inpVals={};
@@ -599,6 +674,11 @@ var khVals={};
 var DB={};
 var DB_KH={};
 var cDept=null,cTrend=null,cKHY=null,cPie=null,cMini1=null,cMini2=null,cMini3=null;
+
+// Chart.js fallback: cho phép đăng nhập và xem bảng khi CDN chưa tải được.
+if(typeof window.Chart==='undefined'){
+  window.Chart=function(){return {destroy:function(){}};};
+}
 
 var INDS=[
   {n:'Giuong-ke-hoach',      lb:'Giường kế hoạch',          dv:'Giường', nh:'Công suất',        fix:true, avg:false},
@@ -648,25 +728,22 @@ function getMonths(){
 function gdAgg(dept,ind){
   var months=getMonths();
   var kh=(DB_KH[selYear]&&DB_KH[selYear][dept])?DB_KH[selYear][dept][ind.n]||0:0;
-  var t=0,ck=0,count=0;
+  var t=0,ck=0,count=0,ckCount=0;
   months.forEach(function(m){
     var row=(DB[selYear]&&DB[selYear][m]&&DB[selYear][m][dept])?DB[selYear][m][dept][ind.n]:null;
-    if(row && (row.t !== undefined || row.ck !== undefined)){
-      t+=row.t||0; ck+=row.ck||0; count++;
-    }
+    var prev=(DB[selYear-1]&&DB[selYear-1][m]&&DB[selYear-1][m][dept])?DB[selYear-1][m][dept][ind.n]:null;
+    if(row && row.t !== undefined){t+=row.t||0;count++;}
+    if(prev && prev.t !== undefined){ck+=prev.t||0;ckCount++;}
+    else if(row && row.ck !== undefined){ck+=row.ck||0;ckCount++;}
   });
-  
-  if(ind.avg && count>0){
-    t = t/count; ck = ck/count;
+  if(ind.avg){
+    if(count>0) t=t/count;
+    if(ckCount>0) ck=ck/ckCount;
   }
-  
   var nm=months.length;
   var pkn=0;
-  if(ind.avg) {
-     pkn = kh>0 ? t/kh : 0; 
-  } else {
-     pkn = kh>0 ? t/(kh/12*nm) : 0; 
-  }
+  if(ind.avg) pkn=kh>0?t/kh:0;
+  else pkn=kh>0?t/(kh/12*nm):0;
   return {t:t,kn:kh,ck:ck,pkn:pkn,pck:ck>0?t/ck-1:0};
 }
 
@@ -678,23 +755,39 @@ async function sbFetch(path,opts){
     method:opts.method||'GET',headers:headers,
     body:opts.body?JSON.stringify(opts.body):undefined
   });
-  if(!res.ok){var e=await res.text();throw new Error(res.status+' '+e);}
-  if(res.status===204) return null;
-  return res.json();
+  var text=await res.text();
+  if(!res.ok) throw new Error(res.status+' '+text);
+  return text ? JSON.parse(text) : null;
+}
+
+async function saveOnlineConfig(key,value){
+  await sbFetch('bv_passwords',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:[{dept:key,password:String(value)}]});
+  PASSWORDS[key]=String(value);
+}
+
+function applyOnlineDefaults(){
+  var y=parseInt(PASSWORDS[DEFAULT_YEAR_KEY]);
+  if(!isNaN(y)&&y>=2000&&y<=2099) selYear=y;
+}
+
+async function loadDataForYear(y){
+  if(!DB[y]) DB[y]={};
+  var data=await sbFetch('bv_data?year=eq.'+y+'&select=*&order=month.asc');
+  DB[y]={};
+  (data||[]).forEach(function(r){
+    if(!DB[y][r.month]) DB[y][r.month]={};
+    if(!DB[y][r.month][r.dept]) DB[y][r.month][r.dept]={};
+    DB[y][r.month][r.dept][r.indicator]={t:+r.thuc_hien||0,ck:+r.ck||0};
+  });
 }
 
 async function loadData(){
   setLoadTxt('Đang tải số liệu...');
-  var data=await sbFetch('bv_data?year=eq.'+selYear+'&select=*&order=month.asc');
-  if(!DB[selYear]) DB[selYear]={};
-  (data||[]).forEach(function(r){
-    if(!DB[selYear][r.month]) DB[selYear][r.month]={};
-    if(!DB[selYear][r.month][r.dept]) DB[selYear][r.month][r.dept]={};
-    DB[selYear][r.month][r.dept][r.indicator]={t:+r.thuc_hien||0,ck:+r.ck||0};
-  });
+  await loadDataForYear(selYear);
+  await loadDataForYear(selYear-1);
   setLoadTxt('Đang tải kế hoạch...');
   var kh=await sbFetch('bv_kh?year=eq.'+selYear+'&select=*');
-  if(!DB_KH[selYear]) DB_KH[selYear]={};
+  DB_KH[selYear]={};
   (kh||[]).forEach(function(r){
     if(!DB_KH[selYear][r.dept]) DB_KH[selYear][r.dept]={};
     DB_KH[selYear][r.dept][r.indicator]=+r.kh_nam||0;
@@ -708,25 +801,28 @@ async function doInit(){
   document.getElementById('loading').style.display='flex';
   document.getElementById('load-sub').textContent='Đang tải dữ liệu...';
   try{
+    applyOnlineDefaults();
     await loadData();
     document.getElementById('loading').style.display='none';
     document.getElementById('main').style.display='block';
     selD=currentDept||DEPTS[0];
     selI=INDS[0].n;xhI=INDS[0].n;
     xhD=currentDept||DEPTS[0];
-    initMonthDropdown();
-    buildFilters();buildDeptSel();buildKHTbl();
+    initDropdowns();
+    buildFilters(); buildInpView();buildKHTbl();
     updateMenuByRole();
     buildPUI();updateBadge();renderAll();
     document.getElementById('kh-yr').textContent=selYear;
     document.getElementById('slo-yr').textContent='Năm '+selYear;
+    var yrInp=document.getElementById('yr-inp'); if(yrInp) yrInp.value=selYear;
     setInterval(function(){doRefresh();},5*60*1000);
     updateLupd();
   }catch(e){
     document.getElementById('loading').style.display='none';
     document.getElementById('login-screen').style.display='flex';
     var errEl=document.getElementById('login-err');
-    if(errEl){errEl.textContent='Lỗi kết nối Supabase: '+e.message;errEl.style.display='block';}
+    if(errEl){errEl.textContent='Đăng nhập đúng nhưng lỗi khởi tạo dữ liệu/giao diện: '+e.message;errEl.style.display='block';}
+    console.error(e);
   }
 }
 function updateLupd(){var now=new Date();document.getElementById('lupd').textContent='Cập nhật: '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');}
@@ -749,7 +845,7 @@ function doShow(id,el){
   document.getElementById('pg-ttl').textContent=T[id]||id;
   if(id==='xh') renderXH();
   if(id==='fin') renderFin();
-  if(id==='input') buildInpTbl();
+  if(id==='input') buildInpView();
   if(id==='kh') buildKHTbl();
 }
 
@@ -771,9 +867,10 @@ function updateBadge(){
   document.getElementById('tb-badge').textContent=lbl;
   document.getElementById('l3-per').textContent=lbl;
 }
-function setYear(y){
+async function setYear(y){
   if(isNaN(y)||y<2000||y>2099) return;
   selYear=y;
+  await saveOnlineConfig(DEFAULT_YEAR_KEY,y);
   document.getElementById('slo-yr').textContent='Năm '+y;
   document.getElementById('kh-yr').textContent=y;
   loadData().then(function(){renderAll();buildKHTbl();});
@@ -915,12 +1012,12 @@ function renderL2(){
 }
 
 function renderL3(){
-  var showD=currentDept?[DEPTS[0],currentDept]:DEPTS.slice(0,7);
+  var showD=currentDept?[DEPTS[0],currentDept]:DEPTS;
   var h='<thead><tr><th>Chỉ tiêu</th>';
-  showD.forEach(function(d){h+='<th colspan="2">'+dl(d)+'</th>';});
+  showD.forEach(function(d){h+='<th class="dept-h" colspan="2">'+dl(d)+'</th>';});
   h+='</tr><tr><th></th>';
   var labels=l3v==='kh'?['Thực hiện','% KH kỳ']:l3v==='ck'?['Thực hiện','% CK']:['Thực hiện','% KH năm'];
-  showD.forEach(function(){h+='<th style="background:#374151;font-size:9px;">'+labels[0]+'</th><th style="background:#374151;font-size:9px;">'+labels[1]+'</th>';});
+  showD.forEach(function(){h+='<th class="metric-h" style="background:#374151;font-size:9px;">'+labels[0]+'</th><th class="metric-h" style="background:#374151;font-size:9px;">'+labels[1]+'</th>';});
   h+='</tr></thead><tbody>';
   INDS.forEach(function(ind){
     h+='<tr><td>'+il(ind)+'</td>';
@@ -930,12 +1027,15 @@ function renderL3(){
       else if(l3v==='ck'){pct2=Math.round(r.pck*100);isCK=true;}
       else pct2=Math.round(r.pkn*100);
       var cls=isCK?ckc(pct2):pcc(pct2),sign=(isCK&&pct2>=0)?'+':'';
-      h+='<td>'+fmt(r.t)+'</td><td><span class="pc '+cls+'">'+sign+pct2+'%</span></td>';
+      h+='<td class="metric-v">'+fmt(r.t)+'</td><td class="metric-v"><span class="pc '+cls+'">'+sign+pct2+'%</span></td>';
     });
     h+='</tr>';
   });
   h+='</tbody>';
-  document.getElementById('l3-tbl').innerHTML=h;
+  var tbl=document.getElementById('l3-tbl');
+  tbl.classList.add('l3tbl');
+  tbl.innerHTML=h;
+  tbl.style.minWidth=(170 + showD.length*128)+'px';
 }
 
 function renderXH(){
@@ -1002,77 +1102,138 @@ function renderFin(){
 
 // ══════════ FORM NHẬP LIỆU (ĐÃ TỐI ƯU UI) ══════════
 
-function buildDeptSel(){
-  document.getElementById('inp-dept').innerHTML=DEPTS.map(function(d){return '<option value="'+d+'">'+dl(d)+'</option>';}).join('');
-}
+// ══════════ LOGIC MA TRẬN & POPUP NHẬP LIỆU ══════════
 
-function initMonthDropdown() {
+// Khởi tạo các Select box
+function initDropdowns() {
   var curM = new Date().getMonth() + 1;
-  var mSelect = document.getElementById('inp-month');
-  if (mSelect) {
-    mSelect.innerHTML = Array.from({length: 12}, function(_, i) {
-       return '<option value="'+(i+1)+'" '+(i+1 === curM ? 'selected' : '')+'>Tháng '+(i+1)+'</option>';
-    }).join('');
-  }
+  var mHtml = Array.from({length: 12}, function(_, i) { return '<option value="'+(i+1)+'" '+(i+1 === curM ? 'selected' : '')+'>Tháng '+(i+1)+'</option>'; }).join('');
+  
+  if(document.getElementById('view-month')) document.getElementById('view-month').innerHTML = mHtml;
+  if(document.getElementById('pop-month')) document.getElementById('pop-month').innerHTML = mHtml;
+  
+  var deptOpts = DEPTS.map(function(d){return '<option value="'+d+'">'+dl(d)+'</option>';}).join('');
+  if(document.getElementById('view-dept')) document.getElementById('view-dept').innerHTML = '<option value="ALL">Toàn viện (Xem tất cả các khoa)</option>' + deptOpts; 
+  if(document.getElementById('pop-dept')) document.getElementById('pop-dept').innerHTML = deptOpts;
 }
 
-function buildInpTbl() {
-  var dept = document.getElementById('inp-dept') ? document.getElementById('inp-dept').value : DEPTS[0];
-  var mSelect = document.getElementById('inp-month');
-  var selMo = mSelect ? parseInt(mSelect.value) : (new Date().getMonth() + 1);
+// 1. Vẽ bảng Ma Trận (View Mode)
+function buildInpView() {
+  var mSelect = document.getElementById('view-month');
+  var dSelect = document.getElementById('view-dept');
+  if(!mSelect || !dSelect) return;
   
-  var rows = '', filled = 0;
-  INDS.forEach(function(ind, ri) {
-    var bg = ri % 2 === 0 ? '#FAFAFA' : '#FFFFFF';
-    var keyThuc = selYear + '|' + selMo + '|' + dept + '|' + ind.n + '|thuc';
-    var keyCk = selYear + '|' + selMo + '|' + dept + '|' + ind.n + '|ck';
+  var selMo = parseInt(mSelect.value);
+  var viewMode = dSelect.value; 
+  var showCols = viewMode === "ALL" ? DEPTS : [viewMode];
+  
+  var h = '<thead><tr><th style="position:sticky; left:0; z-index:2; text-align:left; padding:8px;">Chỉ tiêu</th><th style="width:40px; text-align:center;">ĐV</th>';
+  showCols.forEach(function(d) {
+    h += '<th style="text-align:right; padding:8px; min-width:80px;' + (d==='TV'?'background:#1D4ED8;color:#fff;':'') + '">' + dl(d) + '</th>';
+  });
+  h += '</tr></thead><tbody>';
+  
+  INDS.forEach(function(ind) {
+    h += '<tr style="border-bottom: 1px solid var(--border);">';
+    h += '<td style="position:sticky; left:0; background:var(--light); z-index:1; border-right:1px solid var(--border); font-weight:600; color:var(--navy); padding:8px;">' + il(ind) + '</td>';
+    h += '<td style="text-align:center; color:var(--sub); font-size:10px; background:#fff;">' + ind.dv + '</td>';
     
-    var rowData = (DB[selYear] && DB[selYear][selMo] && DB[selYear][selMo][dept]) ? DB[selYear][selMo][dept][ind.n] : null;
+    showCols.forEach(function(d) {
+      var val = (DB[selYear] && DB[selYear][selMo] && DB[selYear][selMo][d] && DB[selYear][selMo][d][ind.n]) ? DB[selYear][selMo][d][ind.n].t : null;
+      var bg = d === 'TV' ? 'background:#EFF6FF;' : 'background:#fff;';
+      var txt = val !== null && val !== undefined ? fmtN(val) : '<span style="color:#CBD5E1">-</span>';
+      h += '<td style="text-align:right; font-weight:500; padding:8px; border-right:1px solid #F1F5F9; ' + bg + '">' + txt + '</td>';
+    });
+    h += '</tr>';
+  });
+  h += '</tbody>';
+  
+  var matrix = document.getElementById('matrix-tbl');
+  if(matrix) matrix.innerHTML = h;
+}
+
+function getPopupYear(){
+  var el=document.getElementById('pop-year');
+  var y=el?parseInt(el.value):selYear;
+  return (!isNaN(y)&&y>=2000&&y<=2099)?y:selYear;
+}
+
+async function setPopupYear(y){
+  y=parseInt(y);
+  if(isNaN(y)||y<2000||y>2099) return;
+  await saveOnlineConfig(DEFAULT_YEAR_KEY,y);
+  await loadDataForYear(y);
+  await loadDataForYear(y-1);
+  fillPopupData();
+}
+
+// 2. Mở Popup và Đổ dữ liệu vào form
+function openInputModal() {
+  var py=parseInt(PASSWORDS[DEFAULT_YEAR_KEY])||selYear;
+  var pyEl=document.getElementById('pop-year');
+  if(pyEl) pyEl.value=py;
+  document.getElementById('pop-month').value = document.getElementById('view-month').value;
+  var vDept = document.getElementById('view-dept').value;
+  document.getElementById('pop-dept').value = vDept === 'ALL' ? 'TV' : vDept;
+  document.getElementById('pop-msg').textContent = '';
+  document.getElementById('input-modal').style.display = 'flex';
+  setPopupYear(py);
+}
+
+// 3. Render các input điền số trong Popup
+var tempPopupData = {}; 
+function fillPopupData() {
+  var pYear = getPopupYear();
+  var pMonth = parseInt(document.getElementById('pop-month').value);
+  var pDept = document.getElementById('pop-dept').value;
+  tempPopupData = {}; 
+  
+  var rows = '';
+  INDS.forEach(function(ind, i) {
+    var bg = i % 2 === 0 ? '#FAFAFA' : '#FFFFFF';
+    var rowData = (DB[pYear] && DB[pYear][pMonth] && DB[pYear][pMonth][pDept]) ? DB[pYear][pMonth][pDept][ind.n] : null;
+    var prevData = (DB[pYear-1] && DB[pYear-1][pMonth] && DB[pYear-1][pMonth][pDept]) ? DB[pYear-1][pMonth][pDept][ind.n] : null;
+    var vThuc = (rowData && rowData.t !== undefined) ? rowData.t : '';
+    var vCk = (prevData && prevData.t !== undefined) ? prevData.t : ((rowData && rowData.ck !== undefined) ? rowData.ck : '');
     
-    var valThuc = inpVals[keyThuc] !== undefined ? inpVals[keyThuc] : (rowData && rowData.t !== undefined ? rowData.t : '');
-    var valCk = inpVals[keyCk] !== undefined ? inpVals[keyCk] : (rowData && rowData.ck !== undefined ? rowData.ck : '');
-
-    if(valThuc !== '' || valCk !== '') filled++;
-
-    rows += '<tr>';
-    rows += '<td class="ic" style="background:'+bg+'">'+il(ind)+'</td>';
-    rows += '<td class="dc" style="background:'+bg+'">'+ind.dv+'</td>';
-    rows += '<td style="background:'+bg+';padding:3px 3px;"><input class="inn '+(valThuc!==''?'vt':'')+'" type="number" step="any" data-k="'+keyThuc+'" value="'+valThuc+'" placeholder="-"></td>';
-    rows += '<td style="background:'+bg+';padding:3px 3px;"><input class="inn '+(valCk!==''?'vc':'')+'" type="number" step="any" data-k="'+keyCk+'" value="'+valCk+'" placeholder="-"></td>';
+    rows += '<tr style="border-bottom:1px solid #E2E8F0;">';
+    rows += '<td style="padding:8px 12px; font-size:12px; font-weight:600; color:#1E293B; background:'+bg+';">' + il(ind) + '</td>';
+    rows += '<td style="padding:8px; text-align:center; font-size:11px; color:#64748B; background:'+bg+';">' + ind.dv + '</td>';
+    rows += '<td style="padding:6px; background:'+bg+';"><input class="inn pop-inp" style="border:1px solid #E2E8F0; padding:8px; text-align:right; border-radius:6px; background:#fff;" type="number" step="any" data-ind="'+ind.n+'" data-type="t" value="'+vThuc+'" placeholder="0"></td>';
+    rows += '<td style="padding:6px; background:'+bg+';"><input class="inn pop-inp" style="border:1px solid #E2E8F0; padding:8px; text-align:right; border-radius:6px; background:#fff;" type="number" step="any" data-ind="'+ind.n+'" data-type="ck" value="'+vCk+'" placeholder="0" readonly title="Tự lấy từ cùng kỳ năm trước nếu có dữ liệu"></td>';
     rows += '</tr>';
   });
   
-  document.getElementById('inp-body').innerHTML = rows;
-  document.getElementById('inp-stat').textContent = filled ? filled + ' chỉ tiêu có dữ liệu' : '';
-
-  // Bắt sự kiện nhập và ấn phím Enter để nhảy dòng dọc
-  document.querySelectorAll('#inp-body input.inn').forEach(function(inp) {
+  document.getElementById('pop-body').innerHTML = rows;
+  
+  document.querySelectorAll('.pop-inp').forEach(function(inp) {
     inp.addEventListener('input', function() {
-      var k = this.getAttribute('data-k');
-      var isCk = k.endsWith('|ck');
-      if (this.value !== '') {
-        inpVals[k] = this.value;
-        this.classList.add(isCk ? 'vc' : 'vt');
-      } else {
-        delete inpVals[k];
-        this.classList.remove('vt', 'vc');
-      }
+      var ind = this.getAttribute('data-ind');
+      var type = this.getAttribute('data-type');
+      if(!tempPopupData[ind]) tempPopupData[ind] = {};
+      tempPopupData[ind][type] = this.value;
+      this.style.background = type === 't' ? '#EFF6FF' : '#FFFBEB';
+      this.style.borderColor = type === 't' ? '#3B82F6' : '#D97706';
     });
+    
     inp.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
-        var all = Array.prototype.slice.call(document.querySelectorAll('#inp-body input.inn'));
+        var all = Array.prototype.slice.call(document.querySelectorAll('.pop-inp'));
         var idx = all.indexOf(this);
-        if (idx < all.length - 2) all[idx + 2].focus(); // Nhảy ô thẳng xuống dưới
+        if (idx < all.length - 2) all[idx + 2].focus();
       }
     });
   });
 }
 
-async function doSave() {
-  var dept = document.getElementById('inp-dept') ? document.getElementById('inp-dept').value : DEPTS[0];
-  var mSelect = document.getElementById('inp-month');
-  var selMo = mSelect ? parseInt(mSelect.value) : (new Date().getMonth() + 1);
-  var btn = document.getElementById('sv-btn');
+// 4. Lưu dữ liệu từ Popup lên Supabase
+async function savePopupData() {
+  var pYear = getPopupYear();
+
+  var pMonth = parseInt(document.getElementById('pop-month').value);
+  var pDept = document.getElementById('pop-dept').value;
+  var btn = document.getElementById('pop-save-btn');
+  var msgEl = document.getElementById('pop-msg');
   
   btn.disabled = true;
   btn.textContent = 'Đang lưu...';
@@ -1081,19 +1242,20 @@ async function doSave() {
   var hasChanges = false;
   
   INDS.forEach(function(ind) {
-     var keyThuc = selYear + '|' + selMo + '|' + dept + '|' + ind.n + '|thuc';
-     var keyCk = selYear + '|' + selMo + '|' + dept + '|' + ind.n + '|ck';
-     var ex = (DB[selYear] && DB[selYear][selMo] && DB[selYear][selMo][dept]) ? DB[selYear][selMo][dept][ind.n] || {} : {};
+     var ex = (DB[pYear] && DB[pYear][pMonth] && DB[pYear][pMonth][pDept]) ? DB[pYear][pMonth][pDept][ind.n] || {} : {};
+     var prev = (DB[pYear-1] && DB[pYear-1][pMonth] && DB[pYear-1][pMonth][pDept]) ? DB[pYear-1][pMonth][pDept][ind.n] || {} : {};
+     var hasNewInput = tempPopupData[ind.n] !== undefined;
+     if(hasNewInput) hasChanges = true;
      
-     if (inpVals[keyThuc] !== undefined || inpVals[keyCk] !== undefined) hasChanges = true;
+     var vThuc = (hasNewInput && tempPopupData[ind.n].t !== undefined) ? parseFloat(tempPopupData[ind.n].t) : ex.t;
+     var vCk = (prev.t !== undefined) ? parseFloat(prev.t) : ((hasNewInput && tempPopupData[ind.n].ck !== undefined) ? parseFloat(tempPopupData[ind.n].ck) : ex.ck);
      
-     var vThuc = inpVals[keyThuc] !== undefined ? parseFloat(inpVals[keyThuc]) : ex.t;
-     var vCk = inpVals[keyCk] !== undefined ? parseFloat(inpVals[keyCk]) : ex.ck;
+     if(isNaN(vThuc) && ex.t === undefined) return;
      
      ups.push({
-       year: selYear,
-       month: selMo,
-       dept: dept,
+       year: pYear,
+       month: pMonth,
+       dept: pDept,
        indicator: ind.n,
        thuc_hien: isNaN(vThuc) ? 0 : vThuc,
        ck: isNaN(vCk) ? 0 : vCk,
@@ -1101,45 +1263,37 @@ async function doSave() {
      });
   });
   
-  if (!hasChanges) {
-    showSvMsg('Chưa có thay đổi!','err');
+  if (!hasChanges && ups.length === 0) {
+    msgEl.textContent = 'Chưa có thay đổi nào!';
+    msgEl.style.color = '#D97706';
     btn.disabled = false;
-    btn.textContent = 'Lưu dữ liệu';
+    btn.textContent = '💾 Lưu dữ liệu';
     return;
   }
   
   try {
     await sbFetch('bv_data', {method: 'POST', prefer: 'resolution=merge-duplicates,return=minimal', body: ups});
-    // Xóa bộ đệm sau khi lưu thành công
-    Object.keys(inpVals).forEach(function(k) {
-       if (k.startsWith(selYear + '|' + selMo + '|' + dept + '|')) delete inpVals[k];
-    });
-    await doRefresh();
-    buildInpTbl();
-    showSvMsg('Đã lưu dữ liệu Tháng ' + selMo + ' cho ' + dl(dept), 'ok');
+    msgEl.textContent = '✅ Đã lưu thành công!';
+    msgEl.style.color = '#059669';
+    if(pYear!==selYear){await setYear(pYear);} else {await doRefresh();}
+    buildInpView();
+    setTimeout(function() {
+      document.getElementById('input-modal').style.display = 'none';
+      btn.disabled = false;
+      btn.textContent = '💾 Lưu dữ liệu';
+    }, 1000);
   } catch(e) {
-    showSvMsg('Lỗi: ' + e.message, 'err');
+    msgEl.textContent = '❌ Lỗi: ' + e.message;
+    msgEl.style.color = '#DC2626';
+    btn.disabled = false;
+    btn.textContent = '💾 Lưu dữ liệu';
   }
-  
-  btn.disabled = false;
-  btn.textContent = 'Lưu dữ liệu';
 }
-
-function doClear() {
-  var dept = document.getElementById('inp-dept') ? document.getElementById('inp-dept').value : DEPTS[0];
-  var mSelect = document.getElementById('inp-month');
-  var selMo = mSelect ? parseInt(mSelect.value) : (new Date().getMonth() + 1);
-  
-  Object.keys(inpVals).forEach(function(k) {
-     if (k.startsWith(selYear + '|' + selMo + '|' + dept + '|')) delete inpVals[k];
-  });
-  buildInpTbl();
-  showSvMsg('Đã hoàn tác thay đổi chưa lưu', 'ok');
-}
-
 function showSvMsg(msg,type){
   var el=document.getElementById('sv-msg');
-  el.className=type==='ok'?'mok':'merr';el.textContent=msg;
+  if(!el) return;
+  el.className=type==='ok'?'mok':'merr';
+  el.textContent=msg;
   setTimeout(function(){el.textContent='';el.className='';},5000);
 }
 
@@ -1147,7 +1301,7 @@ function showSvMsg(msg,type){
 
 function buildKHTbl(){
   document.getElementById('kh-yr').textContent=selYear;
-  var showD=DEPTS.slice(0,9);
+  var showD=DEPTS;
   var h='<thead><tr><th>Chỉ tiêu</th><th>DV</th>';
   showD.forEach(function(d){h+='<th style="min-width:90px;">'+dl(d)+'</th>';});
   h+='</tr></thead><tbody>';
@@ -1156,39 +1310,83 @@ function buildKHTbl(){
     h+='<tr><td style="font-weight:500;color:var(--navy);padding:5px 8px;">'+il(ind)+'</td>';
     h+='<td style="color:var(--sub);text-align:center;padding:5px;">'+ind.dv+'</td>';
     showD.forEach(function(d){
-      var key=selYear+'|'+d+'|'+ind.n;
-      var val=khVals[key]!==undefined?khVals[key]:((DB_KH[selYear]&&DB_KH[selYear][d])?DB_KH[selYear][d][ind.n]||'':'');
-      h+='<td style="background:'+bg+';padding:3px 3px;"><input class="khinp'+(val?' hv':'')+'" type="number" step="any" data-k="'+key+'" value="'+(val||'')+'" placeholder="-"></td>';
+      var val=(DB_KH[selYear]&&DB_KH[selYear][d])?DB_KH[selYear][d][ind.n]||0:0;
+      h+='<td style="background:'+bg+';padding:6px 8px;text-align:right;font-weight:600;">'+(val?fmtN(val):'<span style="color:#CBD5E1">-</span>')+'</td>';
     });
     h+='</tr>';
   });
   h+='</tbody>';
-  document.getElementById('kh-tbl').innerHTML=h;
-  document.querySelectorAll('#kh-tbl input.khinp').forEach(function(inp){
-    inp.addEventListener('input',function(){
-      var k=this.getAttribute('data-k');
-      if(this.value!==''){khVals[k]=this.value;this.classList.add('hv');}
-      else{delete khVals[k];this.classList.remove('hv');}
-    });
+  var tbl=document.getElementById('kh-tbl');
+  tbl.innerHTML=h;
+  tbl.style.minWidth=(180 + showD.length*110)+'px';
+}
+
+async function setKHYear(y){
+  y=parseInt(y);
+  if(isNaN(y)||y<2000||y>2099) return;
+  if(y!==selYear) await setYear(y);
+  fillKHPopup();
+}
+
+function openKHModal(){
+  var yEl=document.getElementById('kh-pop-year');
+  var dEl=document.getElementById('kh-pop-dept');
+  if(yEl) yEl.value=selYear;
+  if(dEl){
+    dEl.innerHTML=DEPTS.map(function(d){return '<option value="'+d+'">'+dl(d)+'</option>';}).join('');
+    dEl.value='TV';
+  }
+  document.getElementById('kh-pop-msg').textContent='';
+  document.getElementById('kh-modal').style.display='flex';
+  fillKHPopup();
+}
+
+function fillKHPopup(){
+  var y=parseInt(document.getElementById('kh-pop-year').value)||selYear;
+  var dept=document.getElementById('kh-pop-dept').value||'TV';
+  var rows='';
+  INDS.forEach(function(ind,i){
+    var bg=i%2===0?'#FAFAFA':'#FFFFFF';
+    var val=(DB_KH[y]&&DB_KH[y][dept])?DB_KH[y][dept][ind.n]||'':'';
+    rows+='<tr style="border-bottom:1px solid #E2E8F0;">';
+    rows+='<td style="padding:8px 12px;font-size:12px;font-weight:600;color:#1E293B;background:'+bg+';">'+il(ind)+'</td>';
+    rows+='<td style="padding:8px;text-align:center;font-size:11px;color:#64748B;background:'+bg+';">'+ind.dv+'</td>';
+    rows+='<td style="padding:6px;background:'+bg+';"><input class="inn kh-pop-inp" style="border:1px solid #E2E8F0;padding:8px;text-align:right;border-radius:6px;background:#fff;" type="number" step="any" data-ind="'+ind.n+'" value="'+(val||'')+'" placeholder="0"></td>';
+    rows+='</tr>';
   });
+  document.getElementById('kh-pop-body').innerHTML=rows;
 }
 
 async function doSaveKH(){
+  var y=parseInt(document.getElementById('kh-pop-year').value)||selYear;
+  var dept=document.getElementById('kh-pop-dept').value||'TV';
+  var btn=document.getElementById('kh-pop-save-btn');
+  var msg=document.getElementById('kh-pop-msg');
   var ups=[];
-  Object.keys(khVals).forEach(function(k){
-    var p=k.split('|');
-    if(p.length<3) return;
-    ups.push({year:parseInt(p[0]),dept:p[1],indicator:p[2],kh_nam:parseFloat(khVals[k])||0,updated_at:new Date().toISOString()});
+  document.querySelectorAll('#kh-pop-body input.kh-pop-inp').forEach(function(inp){
+    if(inp.value==='') return;
+    ups.push({year:y,dept:dept,indicator:inp.getAttribute('data-ind'),kh_nam:parseFloat(inp.value)||0,updated_at:new Date().toISOString()});
   });
-  if(!ups.length){showKHMsg('Chưa có thay đổi!','err');return;}
+  if(!ups.length){showKHMsg('Chưa có dữ liệu để lưu!','err');return;}
+  btn.disabled=true;btn.textContent='Đang lưu...';
   try{
     await sbFetch('bv_kh',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:ups});
-    khVals={};await doRefresh();buildKHTbl();
-    showKHMsg('Đã lưu '+ups.length+' KH năm '+selYear,'ok');
-  }catch(e){showKHMsg('Lỗi: '+e.message,'err');}
+    await setYear(y);
+    await loadData();
+    buildKHTbl();renderAll();fillKHPopup();
+    msg.textContent='✅ Đã lưu '+ups.length+' chỉ tiêu KH năm '+y+' cho '+dl(dept);
+    msg.style.color='#059669';
+    setTimeout(function(){document.getElementById('kh-modal').style.display='none';},900);
+  }catch(e){
+    msg.textContent='❌ Lỗi lưu online: '+e.message;
+    msg.style.color='#DC2626';
+  }finally{
+    btn.disabled=false;btn.textContent='💾 Lưu KH';
+  }
 }
 function showKHMsg(msg,type){
-  var el=document.getElementById('kh-msg');
+  var el=document.getElementById('kh-pop-msg')||document.getElementById('kh-msg');
+  if(!el) return;
   el.className=type==='ok'?'mok':'merr';el.textContent=msg;
   setTimeout(function(){el.textContent='';el.className='';},5000);
 }
@@ -1229,12 +1427,14 @@ async function doLogin(){
     PASSWORDS={};
     (pws||[]).forEach(function(r){PASSWORDS[r.dept]=r.password;});
   }catch(e){
-    PASSWORDS={};
+    errEl.textContent='Không kết nối được dữ liệu online: '+e.message;
+    errEl.style.display='block';
+    return;
   }
 
   var correct=false;
   if(dept==='admin'){
-    var adminPw=localStorage.getItem(ADMIN_PW_KEY)||PASSWORDS['admin']||'admin123';
+    var adminPw=PASSWORDS['admin']||'1';
     correct=(pw===adminPw);
   }else{
     var deptPw=PASSWORDS[dept]||'1';
@@ -1242,8 +1442,9 @@ async function doLogin(){
   }
 
   if(!correct){
-    errEl.textContent='Mật khẩu không đúng! Mặc định là: 1';
+    errEl.textContent='Mật khẩu không đúng!';
     errEl.style.display='block';
+    alert('Mật khẩu không đúng. Vui lòng kiểm tra lại.');
     document.getElementById('login-pw').value='';
     document.getElementById('login-pw').focus();
     return;
@@ -1308,7 +1509,7 @@ function buildSettingsDeptList(){
 async function saveAllPasswords(){
   var newAdminPw=document.getElementById('new-admin-pw').value.trim();
   if(newAdminPw){
-    localStorage.setItem(ADMIN_PW_KEY,newAdminPw);
+    PASSWORDS['admin']=newAdminPw;
   }
   var inputs=document.querySelectorAll('#settings-dept-list input[data-dept]');
   var upserts=[];
@@ -1320,7 +1521,8 @@ async function saveAllPasswords(){
       PASSWORDS[d]=pw;
     }
   });
-  if(!upserts.length&&!newAdminPw){showSettingsMsg('Không có thay đổi nào!','err');return;}
+  if(newAdminPw){upserts.push({dept:'admin',password:newAdminPw});}
+  if(!upserts.length){showSettingsMsg('Không có thay đổi nào!','err');return;}
   try{
     if(upserts.length){
       await sbFetch('bv_passwords',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:upserts});
@@ -1328,8 +1530,7 @@ async function saveAllPasswords(){
     showSettingsMsg('Đã lưu mật khẩu thành công!','ok');
     setTimeout(function(){document.getElementById('settings-modal').style.display='none';},1500);
   }catch(e){
-    upserts.forEach(function(u){PASSWORDS[u.dept]=u.password;localStorage.setItem('bv_pw_'+u.dept,u.password);});
-    showSettingsMsg('Đã lưu local (chạy SQL tạo bảng bv_passwords để lưu online)','ok');
+    showSettingsMsg('Lỗi lưu online: '+e.message,'err');
   }
 }
 
@@ -1337,7 +1538,7 @@ async function changeDeptPassword(){
   var curPw=document.getElementById('cur-pw').value;
   var newPw=document.getElementById('new-pw').value;
   var confirmPw=document.getElementById('confirm-pw').value;
-  var deptPw=PASSWORDS[currentUser]||localStorage.getItem('bv_pw_'+currentUser)||'1';
+  var deptPw=PASSWORDS[currentUser]||'1';
   if(curPw!==deptPw){showSettingsMsg('Mật khẩu hiện tại không đúng!','err');return;}
   if(!newPw){showSettingsMsg('Vui lòng nhập mật khẩu mới!','err');return;}
   if(newPw!==confirmPw){showSettingsMsg('Mật khẩu xác nhận không khớp!','err');return;}
@@ -1347,9 +1548,7 @@ async function changeDeptPassword(){
     showSettingsMsg('Đổi mật khẩu thành công!','ok');
     setTimeout(function(){document.getElementById('settings-modal').style.display='none';},1500);
   }catch(e){
-    localStorage.setItem('bv_pw_'+currentUser,newPw);
-    PASSWORDS[currentUser]=newPw;
-    showSettingsMsg('Đã lưu! (offline mode)','ok');
+    showSettingsMsg('Lỗi lưu online: '+e.message,'err');
   }
 }
 
